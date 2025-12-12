@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* BOLD CONCEPT Color Palette */
+    --background: 48 20% 98%; /* Off-White #FAFAF8 */
+    --foreground: 0 0% 7%; /* Charcoal Black #111111 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+
+    --primary: 0 0% 7%; /* Charcoal Black */
+    --primary-foreground: 0 0% 100%; /* Pure White */
+
+    --secondary: 35 30% 78%; /* Warm Stone #DCC9B1 */
+    --secondary-foreground: 0 0% 7%;
+
+    --muted: 0 0% 56%; /* Cool Grey #8F8F8F */
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 35 30% 78%; /* Warm Stone */
+    --accent-foreground: 0 0% 7%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 35 30% 78%;
+
+    --radius: 0px;
+
+    /* Custom Design Tokens */
+    --stone: 35 30% 78%;
+    --charcoal: 0 0% 7%;
+    --off-white: 48 20% 98%;
+    --cool-grey: 0 0% 56%;
+    
+    /* Gradients */
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 7% / 0.9), hsl(0 0% 7% / 0.7));
+    --gradient-stone: linear-gradient(135deg, hsl(35 30% 78%), hsl(35 30% 72%));
+    --gradient-hero: linear-gradient(180deg, hsl(0 0% 0% / 0.4), hsl(0 0% 0% / 0.6));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.08);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.1);
+    --shadow-elevated: 0 16px 48px -12px hsl(0 0% 0% / 0.15);
+
+    /* Transitions */
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 48 20% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 48 20% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 48 20% 98%;
+
+    --primary: 48 20% 98%;
+    --primary-foreground: 0 0% 7%;
+
+    --secondary: 35 30% 78%;
+    --secondary-foreground: 0 0% 7%;
+
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 35 30% 78%;
+    --accent-foreground: 0 0% 7%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 35 30% 78%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    @apply tracking-tight;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-[1420px] mx-auto px-6 md:px-8 lg:px-12;
+  }
+
+  .heading-display {
+    font-family: 'Playfair Display', serif;
+    @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.1];
+  }
+
+  .heading-section {
+    font-family: 'Playfair Display', serif;
+    @apply text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.15];
+  }
+
+  .heading-card {
+    font-family: 'Playfair Display', serif;
+    @apply text-xl md:text-2xl font-medium;
+  }
+
+  .text-body {
+    @apply text-base md:text-lg leading-relaxed text-muted-foreground;
+  }
+
+  .text-label {
+    @apply text-xs md:text-sm uppercase tracking-[0.2em] font-medium;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground 
+           font-medium text-sm uppercase tracking-[0.15em] transition-all duration-300
+           hover:bg-secondary hover:text-secondary-foreground;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-8 py-4 border border-current
+           font-medium text-sm uppercase tracking-[0.15em] transition-all duration-300
+           hover:bg-primary hover:text-primary-foreground hover:border-primary;
+  }
+
+  .btn-hero {
+    @apply inline-flex items-center justify-center px-8 py-4 
+           font-medium text-sm uppercase tracking-[0.15em] transition-all duration-300;
+  }
+
+  .card-project {
+    @apply relative overflow-hidden cursor-pointer;
+  }
+
+  .link-underline {
+    @apply relative inline-block;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-px bg-current scale-x-0 origin-right
+           transition-transform duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-ken-burns {
+    animation: kenBurns 12s ease-out infinite alternate;
+  }
+
+  @keyframes kenBurns {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
