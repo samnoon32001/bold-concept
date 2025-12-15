@@ -30,15 +30,10 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      };
-
       const [projectsRes, contactsRes, servicesRes] = await Promise.all([
-        api.getProjects(),
-        api.getContacts(),
-        api.getServices(),
+        api.getProjects(token),
+        api.getContacts(token),
+        api.getServices(token),
       ]);
 
       setProjects(projectsRes);
