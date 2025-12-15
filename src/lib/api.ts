@@ -48,6 +48,23 @@ export interface Contact {
   updatedAt: string;
 }
 
+export interface WebsiteContact {
+  _id?: string;
+  address: string;
+  phone: string;
+  email: string;
+  workingHours: string;
+  mapEmbed?: string;
+  socialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 // API functions
 export const api = {
   // Projects
@@ -159,6 +176,26 @@ export const api = {
       },
     });
     if (!response.ok) throw new Error('Failed to fetch contacts');
+    return response.json();
+  },
+
+  // Website Contact Information
+  async getWebsiteContact(): Promise<WebsiteContact> {
+    const response = await fetch(`${API_BASE_URL}/website-contact`);
+    if (!response.ok) throw new Error('Failed to fetch website contact');
+    return response.json();
+  },
+
+  async updateWebsiteContact(contactData: Partial<WebsiteContact>, token: string): Promise<WebsiteContact> {
+    const response = await fetch(`${API_BASE_URL}/website-contact`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(contactData),
+    });
+    if (!response.ok) throw new Error('Failed to update website contact');
     return response.json();
   },
 

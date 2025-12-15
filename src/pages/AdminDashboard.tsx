@@ -15,9 +15,11 @@ const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [services, setServices] = useState([]);
+  const [websiteContact, setWebsiteContact] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [editingProject, setEditingProject] = useState(null);
   const [editingService, setEditingService] = useState(null);
+  const [editingWebsiteContact, setEditingWebsiteContact] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const navigate = useNavigate();
@@ -35,15 +37,17 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const [projectsRes, contactsRes, servicesRes] = await Promise.all([
+      const [projectsRes, contactsRes, servicesRes, websiteContactRes] = await Promise.all([
         api.getProjects(),
         api.getContacts(token),
         api.getServices(),
+        api.getWebsiteContact(),
       ]);
 
       setProjects(projectsRes);
       setContacts(contactsRes);
       setServices(servicesRes);
+      setWebsiteContact(websiteContactRes);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     }
@@ -130,6 +134,37 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleEditWebsiteContact = () => {
+    setEditingWebsiteContact(true);
+    setEditForm({
+      address: websiteContact?.address || '',
+      phone: websiteContact?.phone || '',
+      email: websiteContact?.email || '',
+      workingHours: websiteContact?.workingHours || '',
+      mapEmbed: websiteContact?.mapEmbed || '',
+      socialMedia: websiteContact?.socialMedia || {
+        facebook: '',
+        instagram: '',
+        linkedin: '',
+        twitter: ''
+      }
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateWebsiteContact = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await api.updateWebsiteContact(editForm, token);
+      setIsEditModalOpen(false);
+      setEditingWebsiteContact(false);
+      setEditForm({});
+      fetchData();
+    } catch (error) {
+      console.error('Failed to update website contact:', error);
+    }
+  };
+
   // Calculate statistics
   const stats = {
     totalProjects: projects.length,
@@ -211,7 +246,7 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-stone-100 border border-stone-200">
+          <TabsList className="grid w-full grid-cols-5 bg-stone-100 border border-stone-200">
             <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
               <BarChart3 className="w-4 h-4 mr-2" />
               Overview
@@ -227,6 +262,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="services" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
               <Settings className="w-4 h-4 mr-2" />
               Services
+            </TabsTrigger>
+            <TabsTrigger value="website-contact" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Website Contact
             </TabsTrigger>
           </TabsList>
 
@@ -444,6 +483,97 @@ const AdminDashboard = () => {
               ))}
             </div>
           </TabsContent>
+
+          {/* Website Contact Tab */}
+          <TabsContent value="website-contact" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-serif text-stone-900">Website Contact Information</h2>
+              <Button 
+                onClick={handleEditWebsiteContact}
+                className="bg-stone-800 hover:bg-stone-700 text-white"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Contact Info
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="border-stone-200 bg-white shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg font-serif text-stone-900">Contact Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-stone-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-stone-700">Address</p>
+                      <p className="text-stone-600 whitespace-pre-line">{websiteContact?.address || 'Not set'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-stone-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-stone-700">Phone</p>
+                      <p className="text-stone-600">{websiteContact?.phone || 'Not set'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-stone-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-stone-700">Email</p>
+                      <p className="text-stone-600">{websiteContact?.email || 'Not set'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-stone-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-stone-700">Working Hours</p>
+                      <p className="text-stone-600 whitespace-pre-line">{websiteContact?.workingHours || 'Not set'}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-stone-200 bg-white shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg font-serif text-stone-900">Social Media</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {websiteContact?.socialMedia && (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-stone-700 w-20">Facebook:</span>
+                        <span className="text-stone-600">{websiteContact.socialMedia.facebook || 'Not set'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-stone-700 w-20">Instagram:</span>
+                        <span className="text-stone-600">{websiteContact.socialMedia.instagram || 'Not set'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-stone-700 w-20">LinkedIn:</span>
+                        <span className="text-stone-600">{websiteContact.socialMedia.linkedin || 'Not set'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-stone-700 w-20">Twitter:</span>
+                        <span className="text-stone-600">{websiteContact.socialMedia.twitter || 'Not set'}</span>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -452,7 +582,7 @@ const AdminDashboard = () => {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif text-stone-900">
-              {editingProject ? 'Edit Project' : 'Edit Service'}
+              {editingProject ? 'Edit Project' : editingService ? 'Edit Service' : 'Edit Website Contact'}
             </DialogTitle>
           </DialogHeader>
           
@@ -528,6 +658,66 @@ const AdminDashboard = () => {
               <div className="flex gap-2">
                 <Button 
                   onClick={handleUpdateService}
+                  className="bg-stone-800 hover:bg-stone-700 text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="border-stone-300 text-stone-700"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {editingWebsiteContact && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="address" className="text-stone-700">Address</Label>
+                <Textarea 
+                  id="address"
+                  value={editForm.address || ''}
+                  onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                  className="border-stone-300"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone" className="text-stone-700">Phone</Label>
+                <Input 
+                  id="phone"
+                  value={editForm.phone || ''}
+                  onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                  className="border-stone-300"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-stone-700">Email</Label>
+                <Input 
+                  id="email"
+                  value={editForm.email || ''}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  className="border-stone-300"
+                />
+              </div>
+              <div>
+                <Label htmlFor="workingHours" className="text-stone-700">Working Hours</Label>
+                <Textarea 
+                  id="workingHours"
+                  value={editForm.workingHours || ''}
+                  onChange={(e) => setEditForm({...editForm, workingHours: e.target.value})}
+                  className="border-stone-300"
+                  rows={2}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleUpdateWebsiteContact}
                   className="bg-stone-800 hover:bg-stone-700 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
