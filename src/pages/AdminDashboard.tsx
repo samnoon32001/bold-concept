@@ -19,6 +19,7 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [editingService, setEditingService] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,32 +79,51 @@ const AdminDashboard = () => {
 
   const handleEditProject = (project: any) => {
     setEditingProject(project);
+    setEditForm({
+      title: project.title,
+      description: project.description,
+      category: project.category,
+      status: project.status,
+      location: project.location,
+      client: project.client || '',
+      featured: project.featured || false
+    });
     setIsEditModalOpen(true);
   };
 
   const handleEditService = (service: any) => {
     setEditingService(service);
+    setEditForm({
+      title: service.title,
+      description: service.description,
+      icon: service.icon || '',
+      features: service.features || [],
+      order: service.order || 0,
+      active: service.active || true
+    });
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateProject = async (projectData: any) => {
+  const handleUpdateProject = async () => {
     try {
       const token = localStorage.getItem('token');
-      await api.updateProject(editingProject._id, projectData, token);
+      await api.updateProject(editingProject._id, editForm, token);
       setIsEditModalOpen(false);
       setEditingProject(null);
+      setEditForm({});
       fetchData();
     } catch (error) {
       console.error('Failed to update project:', error);
     }
   };
 
-  const handleUpdateService = async (serviceData: any) => {
+  const handleUpdateService = async () => {
     try {
       const token = localStorage.getItem('token');
-      await api.updateService(editingService._id, serviceData, token);
+      await api.updateService(editingService._id, editForm, token);
       setIsEditModalOpen(false);
       setEditingService(null);
+      setEditForm({});
       fetchData();
     } catch (error) {
       console.error('Failed to update service:', error);
@@ -442,7 +462,8 @@ const AdminDashboard = () => {
                 <Label htmlFor="title" className="text-stone-700">Title</Label>
                 <Input 
                   id="title"
-                  defaultValue={editingProject.title}
+                  value={editForm.title || ''}
+                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
@@ -450,7 +471,8 @@ const AdminDashboard = () => {
                 <Label htmlFor="description" className="text-stone-700">Description</Label>
                 <Textarea 
                   id="description"
-                  defaultValue={editingProject.description}
+                  value={editForm.description || ''}
+                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
@@ -458,13 +480,14 @@ const AdminDashboard = () => {
                 <Label htmlFor="category" className="text-stone-700">Category</Label>
                 <Input 
                   id="category"
-                  defaultValue={editingProject.category}
+                  value={editForm.category || ''}
+                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
               <div className="flex gap-2">
                 <Button 
-                  onClick={() => handleUpdateProject(editingProject)}
+                  onClick={handleUpdateProject}
                   className="bg-stone-800 hover:bg-stone-700 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
@@ -488,7 +511,8 @@ const AdminDashboard = () => {
                 <Label htmlFor="service-title" className="text-stone-700">Title</Label>
                 <Input 
                   id="service-title"
-                  defaultValue={editingService.title}
+                  value={editForm.title || ''}
+                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
@@ -496,13 +520,14 @@ const AdminDashboard = () => {
                 <Label htmlFor="service-description" className="text-stone-700">Description</Label>
                 <Textarea 
                   id="service-description"
-                  defaultValue={editingService.description}
+                  value={editForm.description || ''}
+                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
               <div className="flex gap-2">
                 <Button 
-                  onClick={() => handleUpdateService(editingService)}
+                  onClick={handleUpdateService}
                   className="bg-stone-800 hover:bg-stone-700 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
