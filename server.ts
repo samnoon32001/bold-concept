@@ -6,11 +6,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import path from 'path';
+import * as fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGODB_URI = process.env.VITE_MONGODB_URI || 'mongodb://localhost:27017';
 
 // Middleware
 app.use(cors());
@@ -21,13 +23,18 @@ app.use('/uploads', express.static('uploads'));
 let db: Db;
 
 async function connectDB() {
-  const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017');
-  await client.connect();
-  db = client.db('bold-concept');
-  console.log('Connected to MongoDB');
-  
-  // Initialize collections with sample data if empty
-  await initializeCollections();
+  try {
+    const client = new MongoClient(MONGODB_URI);
+    await client.connect();
+    db = client.db('bold-concept');
+    console.log('Connected to MongoDB Atlas');
+    
+    // Initialize collections with sample data if empty
+    await initializeCollections();
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
 }
 
 async function initializeCollections() {
@@ -316,7 +323,6 @@ async function startServer() {
   await connectDB();
   
   // Create uploads directory if it doesn't exist
-  const fs = require('fs');
   if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
   }
