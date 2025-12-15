@@ -19,7 +19,7 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [editingService, setEditingService] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState({});
+  const [editForm, setEditForm] = useState<any>({});
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -69,13 +69,14 @@ export const api = {
     return response.json();
   },
 
-  async updateProject(id: string, projectData: FormData, token: string): Promise<boolean> {
+  async updateProject(id: string, projectData: any, token: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      body: projectData,
+      body: JSON.stringify(projectData),
     });
     if (!response.ok) throw new Error('Failed to update project');
     return response.json();
