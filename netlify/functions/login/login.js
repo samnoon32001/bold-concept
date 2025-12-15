@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.VITE_MONGODB_URI;
 const jwtSecret = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   console.log('Headers:', req.headers);
   console.log('Body:', req.body);
   console.log('Environment variables:', {
-    MONGODB_URI: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+    VITE_MONGODB_URI: process.env.VITE_MONGODB_URI ? 'SET' : 'NOT SET',
     JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET'
   });
   

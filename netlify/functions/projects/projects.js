@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.VITE_MONGODB_URI;
 
 export default async function handler(req, res) {
   const client = new MongoClient(uri);
