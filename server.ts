@@ -25,6 +25,132 @@ async function connectDB() {
   await client.connect();
   db = client.db('bold-concept');
   console.log('Connected to MongoDB');
+  
+  // Initialize collections with sample data if empty
+  await initializeCollections();
+}
+
+async function initializeCollections() {
+  try {
+    // Check if projects collection is empty
+    const projectsCount = await db.collection('projects').countDocuments();
+    if (projectsCount === 0) {
+      const sampleProjects = [
+        {
+          title: "Azure Residence",
+          description: "Luxury penthouse with panoramic Dubai skyline views",
+          category: "residential",
+          images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop"],
+          completionDate: new Date('2024-03-15'),
+          location: "Palm Jumeirah, Dubai",
+          client: "Private Client",
+          featured: true,
+          status: "completed",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Horizon Tower Office",
+          description: "Modern corporate office space with advanced technology integration",
+          category: "commercial",
+          images: ["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop"],
+          completionDate: new Date('2024-01-20'),
+          location: "Business Bay, Dubai",
+          client: "Horizon Group",
+          featured: true,
+          status: "completed",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Luxe Boutique Hotel",
+          description: "Boutique hotel renovation with contemporary luxury design",
+          category: "hospitality",
+          images: ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop"],
+          completionDate: new Date('2024-02-10'),
+          location: "Downtown Dubai",
+          client: "Luxe Hotels Group",
+          featured: false,
+          status: "completed",
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      await db.collection('projects').insertMany(sampleProjects);
+      console.log('Sample projects inserted');
+    }
+
+    // Check if services collection is empty
+    const servicesCount = await db.collection('services').countDocuments();
+    if (servicesCount === 0) {
+      const sampleServices = [
+        {
+          title: "Interior Fit-Out",
+          description: "Complete interior construction and finishing services for commercial and residential projects.",
+          icon: "Building2",
+          features: ["Commercial Fit-Outs", "Residential Finishing", "Partition Systems"],
+          order: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Design & Build",
+          description: "Comprehensive turnkey solutions from initial concept through to project completion.",
+          icon: "Paintbrush",
+          features: ["Concept Development", "Space Planning", "Construction Management"],
+          order: 2,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Renovation & Remodeling",
+          description: "Transform existing spaces with our expert renovation services.",
+          icon: "Hammer",
+          features: ["Space Transformation", "Structural Upgrades", "System Modernization"],
+          order: 3,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Project Management",
+          description: "Expert project coordination ensuring on-time, on-budget delivery.",
+          icon: "FolderKanban",
+          features: ["Timeline Management", "Budget Control", "Quality Assurance"],
+          order: 4,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "Joinery Solutions",
+          description: "Custom woodwork and joinery crafted to perfection.",
+          icon: "Drill",
+          features: ["Custom Furniture", "Built-in Cabinetry", "Kitchen Solutions"],
+          order: 5,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          title: "MEP Coordination",
+          description: "Mechanical, electrical, and plumbing integration services.",
+          icon: "Settings",
+          features: ["HVAC Integration", "Electrical Planning", "Smart Building Tech"],
+          order: 6,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      await db.collection('services').insertMany(sampleServices);
+      console.log('Sample services inserted');
+    }
+  } catch (error) {
+    console.error('Error initializing collections:', error);
+  }
 }
 
 // File Upload Configuration
