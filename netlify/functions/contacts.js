@@ -2,7 +2,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 
 const uri = process.env.VITE_MONGODB_URI;
 
-export default async function handler(req, res) {
+exports.handler = async function(event, context) {
   const client = new MongoClient(uri);
   
   try {
@@ -10,28 +10,26 @@ export default async function handler(req, res) {
     const db = client.db('bold-concept');
     const collection = db.collection('contacts');
 
-    switch (req.method) {
-      case 'GET':
-        const contacts = await collection.find({}).sort({ createdAt: -1 }).toArray();
-        return res.status(200).json(contacts);
-
-      case 'POST':
-        const contactData = {
-          ...req.body,
-          status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        const result = await collection.insertOne(contactData);
-        return res.status(201).json({ _id: result.insertedId, ...contactData });
-
-      default:
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+    const contacts = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(contacts)
+    };
   } catch (error) {
     console.error('Contacts API error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
   } finally {
     await client.close();
   }
-}
+};
