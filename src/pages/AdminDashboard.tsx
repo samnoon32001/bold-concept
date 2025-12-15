@@ -15,6 +15,9 @@ const AdminDashboard = () => {
   const [contacts, setContacts] = useState([]);
   const [services, setServices] = useState([]);
   const [activeTab, setActiveTab] = useState('projects');
+  const [editingProject, setEditingProject] = useState(null);
+  const [editingService, setEditingService] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +72,40 @@ const AdminDashboard = () => {
       fetchData();
     } catch (error) {
       console.error('Failed to update contact:', error);
+    }
+  };
+
+  const handleEditProject = (project: any) => {
+    setEditingProject(project);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditService = (service: any) => {
+    setEditingService(service);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateProject = async (projectData: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      await api.updateProject(editingProject._id, projectData, token);
+      setIsEditModalOpen(false);
+      setEditingProject(null);
+      fetchData();
+    } catch (error) {
+      console.error('Failed to update project:', error);
+    }
+  };
+
+  const handleUpdateService = async (serviceData: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      await api.updateService(editingService._id, serviceData, token);
+      setIsEditModalOpen(false);
+      setEditingService(null);
+      fetchData();
+    } catch (error) {
+      console.error('Failed to update service:', error);
     }
   };
 
@@ -130,7 +167,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => handleEditProject(project)}>
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 

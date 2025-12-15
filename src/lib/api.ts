@@ -125,6 +125,19 @@ export const api = {
     return response.json();
   },
 
+  async updateService(id: string, serviceData: Partial<Service>, token: string): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/services/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(serviceData),
+    });
+    if (!response.ok) throw new Error('Failed to update service');
+    return response.json();
+  },
+
   // Contacts
   async submitContact(contactData: Partial<Contact>): Promise<Contact> {
     const response = await fetch(`${API_BASE_URL}/contacts`, {
