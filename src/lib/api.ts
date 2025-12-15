@@ -5,6 +5,7 @@ console.log('=== API DEBUG INFO ===');
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('API_BASE_URL:', API_BASE_URL);
 console.log('Window location:', typeof window !== 'undefined' ? window.location.origin : 'SSR');
+console.log('Netlify detected:', typeof window !== 'undefined' && window.location.hostname.includes('netlify.app'));
 
 // API types
 export interface Project {
