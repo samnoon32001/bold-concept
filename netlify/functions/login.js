@@ -5,26 +5,40 @@ import jwt from 'jsonwebtoken';
 const uri = process.env.VITE_MONGODB_URI;
 const jwtSecret = process.env.JWT_SECRET;
 
-export default async function handler(req, res) {
+exports.handler = async function(event, context) {
   console.log('=== LOGIN API DEBUG ===');
-  console.log('Method:', req.method);
-  console.log('Headers:', req.headers);
-  console.log('Body:', req.body);
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', event.headers);
+  console.log('Body:', event.body);
   console.log('Environment variables:', {
     VITE_MONGODB_URI: process.env.VITE_MONGODB_URI ? 'SET' : 'NOT SET',
     JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET'
   });
-  
-  if (req.method !== 'POST') {
+
+  if (event.httpMethod !== 'POST') {
     console.log('Method not allowed, returning 405');
-    return res.status(405).json({ error: 'Method not allowed' });
+    return {
+      statusCode: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
   try {
-    const { email, password } = req.body;
+    const { email, password } = JSON.parse(event.body);
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Email and password are required' })
+      };
     }
 
     // Check for admin credentials
@@ -35,11 +49,19 @@ export default async function handler(req, res) {
         { expiresIn: '24h' }
       );
 
-      return res.status(200).json({
-        message: 'Login successful',
-        token,
-        user: { email, role: 'admin' }
-      });
+      console.log('Admin login successful');
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          message: 'Login successful',
+          token,
+          user: { email, role: 'admin' }
+        })
+      };
     }
 
     // For other users, check database (you can implement this later)
@@ -51,7 +73,15 @@ export default async function handler(req, res) {
     
     if (!user || !(await bcrypt.compare(password, user.password))) {
       await client.close();
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.log('Invalid credentials');
+      return {
+        statusCode: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Invalid credentials' })
+      };
     }
 
     const token = jwt.sign(
@@ -62,15 +92,30 @@ export default async function handler(req, res) {
 
     await client.close();
 
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: { email: user.email, role: user.role }
-    });
+    console.log('User login successful');
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        message: 'Login successful',
+        token,
+        user: { email: user.email, role: user.role }
+      })
+    };
 
   } catch (error) {
     console.error('Login error details:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Internal server error', details: error.message })
+    };
   }
-}
+};
