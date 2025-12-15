@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -35,14 +36,14 @@ const AdminDashboard = () => {
       };
 
       const [projectsRes, contactsRes, servicesRes] = await Promise.all([
-        fetch('http://localhost:5000/api/projects', { headers }),
-        fetch('http://localhost:5000/api/contacts', { headers }),
-        fetch('http://localhost:5000/api/services', { headers }),
+        api.getProjects(),
+        api.getContacts(),
+        api.getServices(),
       ]);
 
-      setProjects(await projectsRes.json());
-      setContacts(await contactsRes.json());
-      setServices(await servicesRes.json());
+      setProjects(projectsRes);
+      setContacts(contactsRes);
+      setServices(servicesRes);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     }
@@ -58,10 +59,7 @@ const AdminDashboard = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
         const token = localStorage.getItem('token');
-        await fetch(`http://localhost:5000/api/projects/${id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+        await api.deleteProject(id, token);
         fetchData();
       } catch (error) {
         console.error('Failed to delete project:', error);
@@ -72,14 +70,7 @@ const AdminDashboard = () => {
   const handleUpdateContactStatus = async (id: string, status: string) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/contacts/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
+      await api.updateContact(id, status, token);
       fetchData();
     } catch (error) {
       console.error('Failed to update contact:', error);

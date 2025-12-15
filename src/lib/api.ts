@@ -92,6 +92,19 @@ export const api = {
     return response.json();
   },
 
+  async updateContact(id: string, status: string, token: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/contacts/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) throw new Error('Failed to update contact');
+    return response.json();
+  },
+
   // Services
   async getServices(): Promise<Service[]> {
     const response = await fetch(`${API_BASE_URL}/services`);
