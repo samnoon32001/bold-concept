@@ -33,7 +33,7 @@ const AdminDashboard = () => {
       const [projectsRes, contactsRes, servicesRes] = await Promise.all([
         api.getProjects(token),
         api.getContacts(token),
-        api.getServices(token),
+        api.getServices(),
       ]);
 
       setProjects(projectsRes);
