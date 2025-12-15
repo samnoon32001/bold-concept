@@ -6,7 +6,17 @@ const uri = process.env.MONGODB_URI;
 const jwtSecret = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
+  console.log('=== LOGIN API DEBUG ===');
+  console.log('Method:', req.method);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  console.log('Environment variables:', {
+    MONGODB_URI: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+    JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET'
+  });
+  
   if (req.method !== 'POST') {
+    console.log('Method not allowed, returning 405');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -59,7 +69,8 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Login error details:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
