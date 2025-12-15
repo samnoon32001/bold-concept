@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const [projectsRes, contactsRes, servicesRes] = await Promise.all([
-        api.getProjects(token),
+        api.getProjects(),
         api.getContacts(token),
         api.getServices(),
       ]);
