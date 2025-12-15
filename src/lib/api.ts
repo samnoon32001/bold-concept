@@ -1,5 +1,11 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api';
 
+// Debug console
+console.log('=== API DEBUG INFO ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Window location:', typeof window !== 'undefined' ? window.location.origin : 'SSR');
+
 // API types
 export interface Project {
   _id?: string;
@@ -130,6 +136,11 @@ export const api = {
 
   // Auth
   async login(email: string, password: string) {
+    console.log('=== LOGIN API CALL ===');
+    console.log('Endpoint:', `${API_BASE_URL}/login`);
+    console.log('Method: POST');
+    console.log('Headers:', { 'Content-Type': 'application/json' });
+    
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
@@ -137,7 +148,18 @@ export const api = {
       },
       body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) throw new Error('Login failed');
-    return response.json();
+    
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response:', errorText);
+      throw new Error('Login failed');
+    }
+    
+    const result = await response.json();
+    console.log('Login result:', result);
+    return result;
   },
 };

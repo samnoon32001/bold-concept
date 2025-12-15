@@ -19,25 +19,31 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      console.log('=== DEBUG: Login Attempt ===');
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('API_BASE_URL:', process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
+      console.log('Full API URL:', `${process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api'}/login`);
+      console.log('Current URL:', window.location.origin);
+      console.log('Login data:', { email, password: '***' });
+
+      const response = await api.login(email, password);
+      console.log('Login response:', response);
+
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+
+      navigate('/admin');
+      toast({
+        title: "Login successful!",
+        description: "Welcome to the admin dashboard.",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/admin');
-      } else {
-        setError(data.error || 'Login failed');
-      }
     } catch (error) {
-      setError('Network error. Please try again.');
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "Network error. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
