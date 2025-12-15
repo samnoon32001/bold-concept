@@ -1,56 +1,73 @@
-# Welcome to your Lovable project
+# Bold Concept - Interior Design & Construction
 
-## Project info
+A modern interior design and construction company website built with React, TypeScript, and Vite.
 
-**URL**: https://lovable.dev/projects/bfa8d66a-d93b-4f47-a264-1e94bd1cbcd5
+## Features
 
-## How can I edit this code?
+- Modern, responsive design
+- Project portfolio showcase
+- Service offerings display
+- Contact form with MongoDB integration
+- Admin dashboard for content management
+- JWT authentication
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, Shadcn/ui components
+- **Backend**: Node.js, Express.js (serverless functions)
+- **Database**: MongoDB Atlas
+- **Deployment**: Vercel
+- **Authentication**: JWT tokens
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bfa8d66a-d93b-4f47-a264-1e94bd1cbcd5) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB Atlas account
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+```bash
+git clone https://github.com/samnoon32001/bold-concept.git
+cd bold-concept
+```
 
-Follow these steps:
+2. Install dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Add your MongoDB URI and JWT secret to .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Run the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+5. For local backend development:
+```bash
+npm run server
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+```
+VITE_MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Admin Access
 
-## What technologies are used for this project?
+- **Email**: samnoon3200@gmail.com
+- **Password**: 320032
 
 This project is built with:
 
