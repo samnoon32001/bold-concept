@@ -1,66 +1,91 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useEffect, useState } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Ruler, Building } from "lucide-react";
+import { api } from "@/lib/api";
 
-// Mock project data
-const projectsData: Record<string, {
+interface Project {
+  _id: string;
   title: string;
   category: string;
   location: string;
-  year: string;
-  area: string;
   description: string;
-  scope: string[];
+  status: string;
+  client?: string;
+  featured?: boolean;
   images: string[];
-}> = {
-  "1": {
-    title: "Azure Residence",
-    category: "Residential",
-    location: "Palm Jumeirah, Dubai",
-    year: "2023",
-    area: "8,500 sq ft",
-    description: "A stunning waterfront residence featuring contemporary design elements with a warm, inviting atmosphere. The project showcases our expertise in creating luxurious living spaces that perfectly balance aesthetics with functionality.",
-    scope: ["Complete Interior Fit-Out", "Custom Joinery", "MEP Coordination", "Landscape Integration", "Smart Home Systems"],
-    images: [
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=1200&auto=format&fit=crop",
-    ],
-  },
-  "2": {
-    title: "Horizon Tower Office",
-    category: "Commercial",
-    location: "Business Bay, Dubai",
-    year: "2023",
-    area: "15,000 sq ft",
-    description: "A modern corporate headquarters designed to foster collaboration and innovation. The space features open-plan work areas, private executive suites, and state-of-the-art meeting facilities.",
-    scope: ["Office Fit-Out", "Partition Systems", "Acoustic Solutions", "IT Infrastructure", "Custom Furniture"],
-    images: [
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600210492493-0946911123ea?q=80&w=1200&auto=format&fit=crop",
-    ],
-  },
-  "3": {
-    title: "Luxe Boutique Hotel",
-    category: "Hospitality",
-    location: "Downtown Dubai",
-    year: "2022",
-    area: "25,000 sq ft",
-    description: "An intimate boutique hotel that blends contemporary luxury with local cultural influences. Each space was carefully designed to create memorable guest experiences.",
-    scope: ["Full Hotel Fit-Out", "Custom Millwork", "Lighting Design", "FF&E Procurement", "Guest Room Packages"],
-    images: [
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600121848594-d8644e57abab?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop",
-    ],
-  },
-};
+  createdAt: string;
+  updatedAt: string;
+}
 
 const ProjectDetail = () => {
   const { id } = useParams();
-  const project = projectsData[id || "1"] || projectsData["1"];
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        if (!id) {
+          setError('Project ID not found');
+          return;
+        }
+        
+        const projectData = await api.getProjectById(id);
+        setProject(projectData);
+      } catch (err) {
+        setError('Failed to load project');
+        console.error('Error fetching project:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading project...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <h1 className="heading-display mb-4">Project Not Found</h1>
+            <p className="text-body mb-8">{error || 'The project you are looking for does not exist.'}</p>
+            <Link to="/projects" className="btn-primary">
+              Back to Projects
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Map project data to the expected format
+  const mappedProject = {
+    ...project,
+    year: new Date(project.createdAt).getFullYear().toString(),
+    area: 'Custom Size', // This could be added to the backend schema
+    scope: [
+      'Complete Interior Fit-Out',
+      'Custom Joinery',
+      'MEP Coordination',
+      'Quality Assurance'
+    ]
+  };
 
   return (
     <Layout>
@@ -112,7 +137,7 @@ const ProjectDetail = () => {
 
                 <h3 className="text-lg font-medium text-foreground mb-4">Scope of Work</h3>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">
-                  {project.scope.map((item) => (
+                  {mappedProject.scope.map((item) => (
                     <li key={item} className="flex items-center gap-2 text-muted-foreground">
                       <span className="w-2 h-2 bg-secondary rounded-full" />
                       {item}
@@ -165,7 +190,7 @@ const ProjectDetail = () => {
                     <Calendar className="w-5 h-5 text-secondary mt-1" />
                     <div>
                       <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground block mb-1">Year</span>
-                      <span className="text-foreground">{project.year}</span>
+                      <span className="text-foreground">{mappedProject.year}</span>
                     </div>
                   </div>
 
@@ -173,7 +198,7 @@ const ProjectDetail = () => {
                     <Ruler className="w-5 h-5 text-secondary mt-1" />
                     <div>
                       <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground block mb-1">Area</span>
-                      <span className="text-foreground">{project.area}</span>
+                      <span className="text-foreground">{mappedProject.area}</span>
                     </div>
                   </div>
 

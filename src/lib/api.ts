@@ -74,6 +74,12 @@ export const api = {
     return response.json();
   },
 
+  async getProjectById(id: string): Promise<Project> {
+    const response = await fetch(`${API_BASE_URL}/projects/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch project');
+    return response.json();
+  },
+
   async createProject(projectData: any, token: string): Promise<Project> {
     const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'POST',

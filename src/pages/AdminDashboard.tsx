@@ -763,6 +763,67 @@ const AdminDashboard = () => {
                   rows={2}
                 />
               </div>
+              
+              {/* Social Media Links */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-stone-900">Social Media Links</h3>
+                
+                <div>
+                  <Label htmlFor="facebook" className="text-stone-700">Facebook</Label>
+                  <Input 
+                    id="facebook"
+                    placeholder="https://facebook.com/yourpage"
+                    value={editForm.socialMedia?.facebook || ''}
+                    onChange={(e) => setEditForm({
+                      ...editForm, 
+                      socialMedia: { ...editForm.socialMedia, facebook: e.target.value }
+                    })}
+                    className="border-stone-300"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="instagram" className="text-stone-700">Instagram</Label>
+                  <Input 
+                    id="instagram"
+                    placeholder="https://instagram.com/yourprofile"
+                    value={editForm.socialMedia?.instagram || ''}
+                    onChange={(e) => setEditForm({
+                      ...editForm, 
+                      socialMedia: { ...editForm.socialMedia, instagram: e.target.value }
+                    })}
+                    className="border-stone-300"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="linkedin" className="text-stone-700">LinkedIn</Label>
+                  <Input 
+                    id="linkedin"
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    value={editForm.socialMedia?.linkedin || ''}
+                    onChange={(e) => setEditForm({
+                      ...editForm, 
+                      socialMedia: { ...editForm.socialMedia, linkedin: e.target.value }
+                    })}
+                    className="border-stone-300"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="twitter" className="text-stone-700">Twitter</Label>
+                  <Input 
+                    id="twitter"
+                    placeholder="https://twitter.com/yourhandle"
+                    value={editForm.socialMedia?.twitter || ''}
+                    onChange={(e) => setEditForm({
+                      ...editForm, 
+                      socialMedia: { ...editForm.socialMedia, twitter: e.target.value }
+                    })}
+                    className="border-stone-300"
+                  />
+                </div>
+              </div>
               <div className="flex gap-2">
                 <Button 
                   onClick={handleUpdateWebsiteContact}

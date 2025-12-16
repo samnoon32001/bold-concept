@@ -72,6 +72,32 @@ exports.handler = async function(event, context) {
     console.log('Is base64 encoded:', event.isBase64Encoded);
 
     if (event.httpMethod === 'GET') {
+      // Check if this is a request for a specific project
+      if (event.path && event.path.includes('/projects/')) {
+        // Extract ID from path
+        const pathParts = event.path.split('/');
+        const id = pathParts[pathParts.length - 1];
+        
+        console.log('Getting single project with ID:', id);
+        
+        if (id && ObjectId.isValid(id)) {
+          const project = await collection.findOne({ _id: new ObjectId(id) });
+          if (!project) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ error: 'Project not found' })
+            };
+          }
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify(project)
+          };
+        }
+      }
+      
+      // Get all projects
       const projects = await collection.find({}).toArray();
       return {
         statusCode: 200,
