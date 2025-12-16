@@ -278,7 +278,8 @@ app.put('/api/projects/:id', authenticateToken, upload.array('images'), async (r
     res.json({ success: result.modifiedCount > 0 });
   } catch (error) {
     console.error('Error updating project:', error);
-    res.status(500).json({ error: 'Failed to update project', details: error.message });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ error: 'Failed to update project', details: errorMessage });
   }
 });
 
