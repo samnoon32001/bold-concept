@@ -3,21 +3,7 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Ruler, Building } from "lucide-react";
-import { api } from "@/lib/api";
-
-interface Project {
-  _id: string;
-  title: string;
-  category: string;
-  location: string;
-  description: string;
-  status: string;
-  client?: string;
-  featured?: boolean;
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { api, Project } from "@/lib/api";
 
 const ProjectDetail = () => {
   const { id } = useParams();
