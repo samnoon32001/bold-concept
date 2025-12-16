@@ -24,15 +24,35 @@ let db: Db;
 
 async function connectDB() {
   try {
+    console.log('=== DATABASE CONNECTION DEBUG ===');
+    console.log('MongoDB URI:', MONGODB_URI ? 'Set' : 'Not set');
+    
+    if (!MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+    
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     db = client.db('bold-concept');
-    console.log('Connected to MongoDB Atlas');
+    console.log('Connected to MongoDB Atlas successfully');
+    console.log('Database name:', db.databaseName);
+    
+    // Test connection with a simple query
+    await db.admin().ping();
+    console.log('Database ping successful');
     
     // Initialize collections with sample data if empty
     await initializeCollections();
   } catch (error) {
+    console.error('=== DATABASE CONNECTION ERROR ===');
     console.error('MongoDB connection error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+    console.error('Environment variables:', {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      MONGODB_URI_SET: !!process.env.VITE_MONGODB_URI
+    });
     process.exit(1);
   }
 }
@@ -240,30 +260,56 @@ app.post('/api/projects', authenticateToken, upload.array('images'), async (req:
 app.put('/api/projects/:id', authenticateToken, upload.array('images'), async (req: any, res: any) => {
   try {
     const { id } = req.params;
+    console.log('=== PROJECT UPDATE DEBUG ===');
     console.log('Updating project with ID:', id);
+    console.log('Request body keys:', Object.keys(req.body));
     console.log('Request body:', req.body);
     console.log('Files:', req.files);
+    console.log('Files length:', req.files ? req.files.length : 0);
     
     // Validate ObjectId
     if (!ObjectId.isValid(id)) {
+      console.log('Invalid ObjectId format:', id);
       return res.status(400).json({ error: 'Invalid project ID format' });
     }
     
-    const updateData = {
-      ...req.body,
-      images: req.files ? (req.files as Express.Multer.File[]).map((file: any) => `/uploads/${file.filename}`) : [],
+    // Check if project exists first
+    const existingProject = await db.collection('projects').findOne({ _id: new ObjectId(id) });
+    if (!existingProject) {
+      console.log('Project not found with ID:', id);
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    console.log('Existing project found:', existingProject.title);
+    
+    // Build update data carefully
+    const updateData: any = {
       updatedAt: new Date()
     };
     
-    // Remove undefined fields to prevent issues
-    Object.keys(updateData).forEach(key => {
-      if (updateData[key] === undefined || updateData[key] === 'undefined') {
-        delete updateData[key];
+    // Add text fields
+    const textFields = ['title', 'description', 'category', 'status', 'location', 'client', 'featured'];
+    textFields.forEach(field => {
+      if (req.body[field] !== undefined && req.body[field] !== null) {
+        if (field === 'featured') {
+          updateData[field] = req.body[field] === 'true' || req.body[field] === true;
+        } else {
+          updateData[field] = req.body[field];
+        }
       }
     });
     
-    console.log('Update data:', updateData);
+    // Handle images
+    if (req.files && req.files.length > 0) {
+      updateData.images = (req.files as Express.Multer.File[]).map((file: any) => `/uploads/${file.filename}`);
+      console.log('New images added:', updateData.images);
+    } else {
+      // Keep existing images if no new ones uploaded
+      updateData.images = existingProject.images || [];
+    }
     
+    console.log('Final update data:', updateData);
+    
+    // Perform the update
     const result = await db.collection('projects').updateOne(
       { _id: new ObjectId(id) },
       { $set: updateData }
@@ -272,14 +318,24 @@ app.put('/api/projects/:id', authenticateToken, upload.array('images'), async (r
     console.log('Update result:', result);
     
     if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Project not found' });
+      return res.status(404).json({ error: 'Project not found after update attempt' });
     }
     
-    res.json({ success: result.modifiedCount > 0 });
+    // Return the updated project
+    const updatedProject = await db.collection('projects').findOne({ _id: new ObjectId(id) });
+    res.json({ success: true, project: updatedProject });
+    
   } catch (error) {
+    console.error('=== PROJECT UPDATE ERROR ===');
     console.error('Error updating project:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ error: 'Failed to update project', details: errorMessage });
+    console.error('Error message:', errorMessage);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    res.status(500).json({ 
+      error: 'Failed to update project', 
+      details: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined
+    });
   }
 });
 
