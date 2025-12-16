@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings, X, Save, Eye, Users, BarChart3, TrendingUp, Image as ImageIcon } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ImageCropModal } from '@/components/ImageCropModal';
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -22,6 +23,10 @@ const AdminDashboard = () => {
   const [managingImages, setManagingImages] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [currentImageForCrop, setCurrentImageForCrop] = useState<string | null>(null);
+  const [currentImageType, setCurrentImageType] = useState<string | null>(null);
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedDetailedImages, setSelectedDetailedImages] = useState<File[]>([]);
@@ -158,6 +163,137 @@ const AdminDashboard = () => {
   const handleManageImages = (project: any) => {
     setManagingImages(project);
     setIsImageModalOpen(true);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, imageType: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log(`Selected ${imageType} image:`, file.name, file.type, file.size);
+      
+      // Read the file and open crop modal
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageSrc = event.target?.result as string;
+        setCurrentImageForCrop(imageSrc);
+        setCurrentImageType(imageType);
+        setIsCropModalOpen(true);
+        
+        // Clear the input
+        if (e.target) {
+          e.target.value = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    console.log('Crop completed for:', currentImageType);
+    console.log('Cropped file:', croppedFile);
+    
+    if (!managingImages || !currentImageType) return;
+    
+    // Update the managingImages state with the cropped image
+    const imageUrl = URL.createObjectURL(croppedFile);
+    
+    if (currentImageType === 'preview') {
+      setManagingImages({ ...managingImages, previewImage: imageUrl });
+    } else if (currentImageType === 'banner') {
+      setManagingImages({ ...managingImages, detailBannerImage: imageUrl });
+    } else if (currentImageType === 'gallery') {
+      const currentGallery = managingImages.galleryImages || [];
+      setManagingImages({ 
+        ...managingImages, 
+        galleryImages: [...currentGallery, imageUrl] 
+      });
+    }
+    
+    // Reset crop modal state
+    setCurrentImageForCrop(null);
+    setCurrentImageType(null);
+  };
+
+  const getAspectRatio = (imageType: string): number => {
+    switch (imageType) {
+      case 'preview':
+        return 4/3; // Home screen preview
+      case 'banner':
+        return 16/9; // Detail page banner
+      case 'gallery':
+        return 16/10; // Gallery images
+      default:
+        return 1; // Square fallback
+    }
+  };
+
+  const getImageTitle = (imageType: string): string => {
+    switch (imageType) {
+      case 'preview':
+        return 'Preview Image';
+      case 'banner':
+        return 'Banner Image';
+      case 'gallery':
+        return 'Gallery Image';
+      default:
+        return 'Image';
+    }
+  };
+
+  const handleSaveImages = async () => {
+    if (!managingImages) return;
+    
+    setImageUploadLoading(true);
+    console.log('Starting image save process...');
+    console.log('Current managing images state:', managingImages);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      // Prepare the update payload with image data
+      const updateData = {
+        previewImage: managingImages.previewImage || null,
+        detailBannerImage: managingImages.detailBannerImage || null,
+        galleryImages: managingImages.galleryImages || [],
+      };
+      
+      console.log('Sending image update payload:', updateData);
+      
+      // Call API to update project images
+      const updatedProject = await api.updateProject(managingImages._id, updateData, token);
+      console.log('API response:', updatedProject);
+      
+      // Update local state
+      setProjects(projects.map(p => 
+        p._id === managingImages._id ? updatedProject : p
+      ));
+      
+      // Show success feedback
+      alert('Images saved successfully!');
+      setIsImageModalOpen(false);
+      
+    } catch (error) {
+      console.error('Failed to save images:', error);
+      alert('Failed to save images. Please try again.');
+    } finally {
+      setImageUploadLoading(false);
+    }
+  };
+
+  const handleRemoveImage = (imageType: string, index?: number) => {
+    if (!managingImages) return;
+    
+    if (imageType === 'preview') {
+      setManagingImages({ ...managingImages, previewImage: null });
+    } else if (imageType === 'banner') {
+      setManagingImages({ ...managingImages, detailBannerImage: null });
+    } else if (imageType === 'gallery' && typeof index === 'number') {
+      const currentGallery = managingImages.galleryImages || [];
+      const newGallery = currentGallery.filter((_, i) => i !== index);
+      setManagingImages({ ...managingImages, galleryImages: newGallery });
+    }
   };
 
   const handleSaveProject = async () => {
@@ -984,6 +1120,7 @@ const AdminDashboard = () => {
                       variant="outline" 
                       size="sm" 
                       className="text-red-600 border-red-300 hover:bg-red-50"
+                      onClick={() => handleRemoveImage('preview')}
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       Remove Preview Image
@@ -994,6 +1131,7 @@ const AdminDashboard = () => {
                     <Input 
                       type="file"
                       accept="image/*"
+                      onChange={(e) => handleImageSelect(e, 'preview')}
                       className="border-stone-300"
                       placeholder="Upload preview image (4:3 ratio)"
                     />
@@ -1018,6 +1156,7 @@ const AdminDashboard = () => {
                       variant="outline" 
                       size="sm" 
                       className="text-red-600 border-red-300 hover:bg-red-50"
+                      onClick={() => handleRemoveImage('banner')}
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       Remove Banner Image
@@ -1028,6 +1167,7 @@ const AdminDashboard = () => {
                     <Input 
                       type="file"
                       accept="image/*"
+                      onChange={(e) => handleImageSelect(e, 'banner')}
                       className="border-stone-300"
                       placeholder="Upload banner image (16:9 ratio)"
                     />
@@ -1055,6 +1195,7 @@ const AdminDashboard = () => {
                             variant="outline" 
                             size="sm" 
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 text-white border-red-600 hover:bg-red-700"
+                            onClick={() => handleRemoveImage('gallery', index)}
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
@@ -1067,6 +1208,7 @@ const AdminDashboard = () => {
                           type="file"
                           accept="image/*"
                           multiple
+                          onChange={(e) => handleImageSelect(e, 'gallery')}
                           className="border-stone-300"
                           placeholder="Add more gallery images (up to 3 total)"
                         />
@@ -1080,6 +1222,7 @@ const AdminDashboard = () => {
                       type="file"
                       accept="image/*"
                       multiple
+                      onChange={(e) => handleImageSelect(e, 'gallery')}
                       className="border-stone-300"
                       placeholder="Upload gallery images (16:10 ratio)"
                     />
@@ -1090,10 +1233,21 @@ const AdminDashboard = () => {
               
               <div className="flex gap-2 pt-4 border-t border-stone-200">
                 <Button 
+                  onClick={handleSaveImages}
+                  disabled={imageUploadLoading}
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold"
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Images
+                  {imageUploadLoading ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Images
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -1108,6 +1262,20 @@ const AdminDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Crop Modal */}
+      <ImageCropModal
+        isOpen={isCropModalOpen}
+        onClose={() => {
+          setIsCropModalOpen(false);
+          setCurrentImageForCrop(null);
+          setCurrentImageType(null);
+        }}
+        imageSrc={currentImageForCrop || ''}
+        onCropComplete={handleCropComplete}
+        aspectRatio={currentImageType ? getAspectRatio(currentImageType) : 1}
+        title={currentImageType ? getImageTitle(currentImageType) : 'Image'}
+      />
     </div>
   );
 };

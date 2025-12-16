@@ -106,7 +106,7 @@ export const api = {
     return response.json();
   },
 
-  async updateProject(id: string, projectData: any, token: string): Promise<boolean> {
+  async updateProject(id: string, projectData: any, token: string): Promise<Project> {
     const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
       method: 'PUT',
       headers: {
