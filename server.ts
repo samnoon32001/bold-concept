@@ -267,29 +267,32 @@ app.delete('/api/projects/:id', authenticateToken, async (req: any, res: any) =>
   }
 });
 
-// Contacts Management
-app.get('/api/contacts', authenticateToken, async (req: any, res: any) => {
+// Website Contact Management
+app.get('/api/website-contact', async (req, res) => {
   try {
-    const contacts = await db.collection('contacts').find({}).toArray();
-    res.json(contacts);
+    const contact = await db.collection('websiteContact').findOne();
+    res.json(contact);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch contacts' });
+    res.status(500).json({ error: 'Failed to fetch website contact' });
   }
 });
 
-app.post('/api/contacts', async (req, res) => {
+app.put('/api/website-contact', authenticateToken, async (req: any, res: any) => {
   try {
     const contactData = {
       ...req.body,
-      status: 'new',
-      createdAt: new Date(),
       updatedAt: new Date()
     };
     
-    const result = await db.collection('contacts').insertOne(contactData);
-    res.json({ ...contactData, _id: result.insertedId });
+    const result = await db.collection('websiteContact').updateOne(
+      {}, 
+      { $set: contactData },
+      { upsert: true }
+    );
+    
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to submit contact' });
+    res.status(500).json({ error: 'Failed to update website contact' });
   }
 });
 
@@ -315,6 +318,36 @@ app.post('/api/services', authenticateToken, async (req: any, res: any) => {
     res.json({ ...serviceData, _id: result.insertedId });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create service' });
+  }
+});
+
+app.put('/api/services/:id', authenticateToken, upload.single('icon'), async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const updateData = {
+      ...req.body,
+      icon: req.file ? `/uploads/${req.file.filename}` : req.body.icon || '',
+      updatedAt: new Date()
+    };
+    
+    const result = await db.collection('services').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+    
+    res.json({ success: result.modifiedCount > 0 });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update service' });
+  }
+});
+
+app.delete('/api/services/:id', authenticateToken, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const result = await db.collection('services').deleteOne({ _id: new ObjectId(id) });
+    res.json({ success: result.deletedCount > 0 });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete service' });
   }
 });
 

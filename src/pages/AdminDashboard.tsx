@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
-  const [contacts, setContacts] = useState([]);
   const [services, setServices] = useState([]);
   const [websiteContact, setWebsiteContact] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -22,6 +21,10 @@ const AdminDashboard = () => {
   const [editingWebsiteContact, setEditingWebsiteContact] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedIcon, setSelectedIcon] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const iconInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,15 +40,13 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const [projectsRes, contactsRes, servicesRes, websiteContactRes] = await Promise.all([
+      const [projectsRes, servicesRes, websiteContactRes] = await Promise.all([
         api.getProjects(),
-        api.getContacts(token),
         api.getServices(),
         api.getWebsiteContact(),
       ]);
 
       setProjects(projectsRes);
-      setContacts(contactsRes);
       setServices(servicesRes);
       setWebsiteContact(websiteContactRes);
     } catch (error) {
@@ -71,17 +72,23 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpdateContactStatus = async (id: string, status: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      await api.updateContact(id, status, token);
-      fetchData();
-    } catch (error) {
-      console.error('Failed to update contact:', error);
-    }
+  const handleAddProject = () => {
+    setEditingProject(null);
+    setEditForm({
+      title: '',
+      description: '',
+      category: '',
+      status: 'ongoing',
+      location: '',
+      client: '',
+      featured: false
+    });
+    setIsEditModalOpen(true);
   };
 
   const handleEditProject = (project: any) => {
+    setEditingService(null);
+    setEditingWebsiteContact(false);
     setEditingProject(project);
     setEditForm({
       title: project.title,
@@ -96,6 +103,8 @@ const AdminDashboard = () => {
   };
 
   const handleEditService = (service: any) => {
+    setEditingProject(null);
+    setEditingWebsiteContact(false);
     setEditingService(service);
     setEditForm({
       title: service.title,
@@ -108,26 +117,79 @@ const AdminDashboard = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateProject = async () => {
+  const handleIconSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedIcon(file);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedImages(files);
+  };
+
+  const handleSaveProject = async () => {
     try {
       const token = localStorage.getItem('token');
-      await api.updateProject(editingProject._id, editForm, token);
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Add all form fields
+      Object.keys(editForm).forEach(key => {
+        if (key !== 'images') {
+          formData.append(key, editForm[key]);
+        }
+      });
+      
+      // Add images if selected
+      selectedImages.forEach((image, index) => {
+        formData.append(`images`, image);
+      });
+      
+      if (editingProject) {
+        // Update existing project
+        await api.updateProject(editingProject._id, formData, token);
+      } else {
+        // Create new project
+        await api.createProject(formData, token);
+      }
+      
       setIsEditModalOpen(false);
       setEditingProject(null);
       setEditForm({});
+      setSelectedImages([]);
       fetchData();
     } catch (error) {
-      console.error('Failed to update project:', error);
+      console.error('Failed to save project:', error);
     }
   };
 
   const handleUpdateService = async () => {
     try {
       const token = localStorage.getItem('token');
-      await api.updateService(editingService._id, editForm, token);
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Add all form fields
+      Object.keys(editForm).forEach(key => {
+        if (key !== 'icon') {
+          formData.append(key, editForm[key]);
+        }
+      });
+      
+      // Add icon if selected
+      if (selectedIcon) {
+        formData.append('icon', selectedIcon);
+      } else if (editForm.icon) {
+        formData.append('icon', editForm.icon);
+      }
+      
+      await api.updateService(editingService._id, formData, token);
       setIsEditModalOpen(false);
       setEditingService(null);
       setEditForm({});
+      setSelectedIcon(null);
       fetchData();
     } catch (error) {
       console.error('Failed to update service:', error);
@@ -135,6 +197,8 @@ const AdminDashboard = () => {
   };
 
   const handleEditWebsiteContact = () => {
+    setEditingProject(null);
+    setEditingService(null);
     setEditingWebsiteContact(true);
     setEditForm({
       address: websiteContact?.address || '',
@@ -168,9 +232,7 @@ const AdminDashboard = () => {
   // Calculate statistics
   const stats = {
     totalProjects: projects.length,
-    totalContacts: contacts.length,
     activeServices: services.filter(s => s.active).length,
-    newContacts: contacts.filter(c => c.status === 'new').length,
     completedProjects: projects.filter(p => p.status === 'completed').length,
   };
 
@@ -194,7 +256,7 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-6 py-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -203,18 +265,6 @@ const AdminDashboard = () => {
                   <p className="text-3xl font-bold text-stone-900 mt-2">{stats.totalProjects}</p>
                 </div>
                 <FolderOpen className="w-8 h-8 text-stone-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-stone-600">New Contacts</p>
-                  <p className="text-3xl font-bold text-stone-900 mt-2">{stats.newContacts}</p>
-                </div>
-                <MessageSquare className="w-8 h-8 text-stone-400" />
               </div>
             </CardContent>
           </Card>
@@ -246,7 +296,7 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-stone-100 border border-stone-200">
+          <TabsList className="grid w-full grid-cols-4 bg-stone-100 border border-stone-200">
             <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
               <BarChart3 className="w-4 h-4 mr-2" />
               Overview
@@ -254,10 +304,6 @@ const AdminDashboard = () => {
             <TabsTrigger value="projects" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
               <FolderOpen className="w-4 h-4 mr-2" />
               Projects
-            </TabsTrigger>
-            <TabsTrigger value="contacts" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
-              <Users className="w-4 h-4 mr-2" />
-              Contacts
             </TabsTrigger>
             <TabsTrigger value="services" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
               <Settings className="w-4 h-4 mr-2" />
@@ -271,7 +317,7 @@ const AdminDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
               <Card className="border-stone-200 bg-white">
                 <CardHeader>
                   <CardTitle className="text-lg font-serif text-stone-900">Recent Projects</CardTitle>
@@ -292,27 +338,6 @@ const AdminDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              <Card className="border-stone-200 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-lg font-serif text-stone-900">Recent Contacts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {contacts.slice(0, 3).map((contact: any) => (
-                      <div key={contact._id} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-stone-900">{contact.name}</h4>
-                          <p className="text-sm text-stone-600">{contact.email}</p>
-                        </div>
-                        <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                          {contact.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </TabsContent>
 
@@ -320,7 +345,10 @@ const AdminDashboard = () => {
           <TabsContent value="projects" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-serif text-stone-900">Manage Projects</h2>
-              <Button className="bg-stone-800 hover:bg-stone-700 text-white">
+              <Button 
+                onClick={handleAddProject}
+                className="bg-stone-800 hover:bg-stone-700 text-white"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Project
               </Button>
@@ -367,62 +395,6 @@ const AdminDashboard = () => {
                             {project.location}
                           </span>
                         </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Contacts Tab */}
-          <TabsContent value="contacts" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-serif text-stone-900">Contact Submissions</h2>
-              <div className="flex items-center gap-2 text-sm text-stone-600">
-                <Users className="w-4 h-4" />
-                {contacts.length} total contacts
-              </div>
-            </div>
-            
-            <div className="grid gap-4">
-              {contacts.map((contact: any) => (
-                <Card key={contact._id} className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center">
-                            <Users className="w-5 h-5 text-stone-600" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-stone-900">{contact.name}</h3>
-                            <p className="text-stone-600">{contact.email}</p>
-                            {contact.phone && <p className="text-stone-600">{contact.phone}</p>}
-                            <p className="text-sm text-stone-700 mt-2 bg-stone-50 p-3 rounded-lg">{contact.message}</p>
-                            {contact.projectType && (
-                              <p className="text-sm text-stone-600 mt-2">
-                                <span className="font-medium">Project Type:</span> {contact.projectType}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <Select 
-                          value={contact.status} 
-                          onValueChange={(value) => handleUpdateContactStatus(contact._id, value)}
-                        >
-                          <SelectTrigger className="w-32 border-stone-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="contacted">Contacted</SelectItem>
-                            <SelectItem value="converted">Converted</SelectItem>
-                            <SelectItem value="closed">Closed</SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
                     </div>
                   </CardContent>
@@ -582,7 +554,7 @@ const AdminDashboard = () => {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif text-stone-900">
-              {editingProject ? 'Edit Project' : editingService ? 'Edit Service' : 'Edit Website Contact'}
+              {editingProject ? (editingProject._id ? 'Edit Project' : 'Add Project') : editingService ? 'Edit Service' : 'Edit Website Contact'}
             </DialogTitle>
           </DialogHeader>
           
@@ -615,9 +587,26 @@ const AdminDashboard = () => {
                   className="border-stone-300"
                 />
               </div>
+              <div>
+                <Label htmlFor="images" className="text-stone-700">Project Images</Label>
+                <Input 
+                  id="images"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleImageSelect}
+                  className="border-stone-300"
+                />
+                {selectedImages.length > 0 && (
+                  <p className="text-sm text-stone-600 mt-2">
+                    {selectedImages.length} image(s) selected
+                  </p>
+                )}
+              </div>
               <div className="flex gap-2">
                 <Button 
-                  onClick={handleUpdateProject}
+                  onClick={handleSaveProject}
                   className="bg-stone-800 hover:bg-stone-700 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
@@ -654,6 +643,22 @@ const AdminDashboard = () => {
                   onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                   className="border-stone-300"
                 />
+              </div>
+              <div>
+                <Label htmlFor="service-icon" className="text-stone-700">Service Icon</Label>
+                <Input 
+                  id="service-icon"
+                  type="file"
+                  accept="image/*"
+                  ref={iconInputRef}
+                  onChange={handleIconSelect}
+                  className="border-stone-300"
+                />
+                {selectedIcon && (
+                  <p className="text-sm text-stone-600 mt-2">
+                    Icon selected: {selectedIcon.name}
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button 

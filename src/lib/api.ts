@@ -86,14 +86,13 @@ export const api = {
     return response.json();
   },
 
-  async updateProject(id: string, projectData: any, token: string): Promise<boolean> {
+  async updateProject(id: string, projectData: FormData, token: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(projectData),
+      body: projectData,
     });
     if (!response.ok) throw new Error('Failed to update project');
     return response.json();
@@ -143,14 +142,13 @@ export const api = {
     return response.json();
   },
 
-  async updateService(id: string, serviceData: Partial<Service>, token: string): Promise<boolean> {
+  async updateService(id: string, serviceData: FormData, token: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_URL}/services/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify(serviceData),
+      body: serviceData,
     });
     if (!response.ok) throw new Error('Failed to update service');
     return response.json();
