@@ -76,8 +76,8 @@ const ProjectDetail = () => {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[40vh] min-h-[300px] flex items-end">
+      {/* Hero - Position right after navbar */}
+      <section className="relative mt-20 md:mt-24 h-[40vh] min-h-[300px] flex items-end">
         <div className="absolute inset-0">
           <img
             src={project.detailBannerImage || project.images?.[0] || '/placeholder-project.jpg'}
