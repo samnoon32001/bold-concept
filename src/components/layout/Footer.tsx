@@ -1,7 +1,26 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Linkedin, Facebook } from "lucide-react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export const Footer = () => {
+  const [websiteContact, setWebsiteContact] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWebsiteContact = async () => {
+      try {
+        const data = await api.getWebsiteContact();
+        setWebsiteContact(data);
+      } catch (error) {
+        console.error('Failed to fetch website contact:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWebsiteContact();
+  }, []);
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-custom py-16 md:py-24">
@@ -18,27 +37,65 @@ export const Footer = () => {
               Transforming spaces with precision and excellence.
             </p>
             <div className="flex gap-4">
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={18} />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook size={18} />
-              </a>
+              {websiteContact?.socialMedia?.facebook && (
+                <a
+                  href={websiteContact.socialMedia.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={18} />
+                </a>
+              )}
+              {websiteContact?.socialMedia?.instagram && (
+                <a
+                  href={websiteContact.socialMedia.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
+                  aria-label="Instagram"
+                >
+                  <Instagram size={18} />
+                </a>
+              )}
+              {websiteContact?.socialMedia?.linkedin && (
+                <a
+                  href={websiteContact.socialMedia.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={18} />
+                </a>
+              )}
+              {/* Show fallback icons if no social media links are set */}
+              {!websiteContact?.socialMedia?.facebook && !websiteContact?.socialMedia?.instagram && !websiteContact?.socialMedia?.linkedin && (
+                <>
+                  <a
+                    href="#"
+                    className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors opacity-50"
+                    aria-label="Instagram"
+                  >
+                    <Instagram size={18} />
+                  </a>
+                  <a
+                    href="#"
+                    className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors opacity-50"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin size={18} />
+                  </a>
+                  <a
+                    href="#"
+                    className="w-10 h-10 flex items-center justify-center border border-primary-foreground/20 hover:border-secondary hover:text-secondary transition-colors opacity-50"
+                    aria-label="Facebook"
+                  >
+                    <Facebook size={18} />
+                  </a>
+                </>
+              )}
             </div>
           </div>
 
@@ -89,26 +146,38 @@ export const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-secondary mt-1 flex-shrink-0" />
                 <span className="text-primary-foreground/70 text-sm">
-                  Business Bay, Dubai, UAE
+                  {websiteContact?.address || 'Business Bay, Dubai, UAE'}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="text-secondary flex-shrink-0" />
-                <a
-                  href="tel:+97144567890"
-                  className="text-primary-foreground/70 hover:text-secondary transition-colors text-sm"
-                >
-                  +971 4 456 7890
-                </a>
+                {websiteContact?.phone ? (
+                  <a
+                    href={`tel:${websiteContact.phone}`}
+                    className="text-primary-foreground/70 hover:text-secondary transition-colors text-sm"
+                  >
+                    {websiteContact.phone}
+                  </a>
+                ) : (
+                  <span className="text-primary-foreground/70 text-sm">
+                    +971 4 456 7890
+                  </span>
+                )}
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-secondary flex-shrink-0" />
-                <a
-                  href="mailto:info@boldconcept.ae"
-                  className="text-primary-foreground/70 hover:text-secondary transition-colors text-sm"
-                >
-                  info@boldconcept.ae
-                </a>
+                {websiteContact?.email ? (
+                  <a
+                    href={`mailto:${websiteContact.email}`}
+                    className="text-primary-foreground/70 hover:text-secondary transition-colors text-sm"
+                  >
+                    {websiteContact.email}
+                  </a>
+                ) : (
+                  <span className="text-primary-foreground/70 text-sm">
+                    info@boldconcept.ae
+                  </span>
+                )}
               </li>
             </ul>
           </div>
