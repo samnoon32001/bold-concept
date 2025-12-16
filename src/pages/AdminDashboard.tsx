@@ -591,7 +591,7 @@ const AdminDashboard = () => {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif text-stone-900">
               {editingProject ? (editingProject._id ? 'Edit Project' : 'Add Project') : editingService ? (editingService._id ? 'Edit Service' : 'Add Service') : 'Edit Website Contact'}
@@ -724,104 +724,121 @@ const AdminDashboard = () => {
           )}
 
           {editingWebsiteContact && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="address" className="text-stone-700">Address</Label>
-                <Textarea 
-                  id="address"
-                  value={editForm.address || ''}
-                  onChange={(e) => setEditForm({...editForm, address: e.target.value})}
-                  className="border-stone-300"
-                  rows={3}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone" className="text-stone-700">Phone</Label>
-                <Input 
-                  id="phone"
-                  value={editForm.phone || ''}
-                  onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                  className="border-stone-300"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email" className="text-stone-700">Email</Label>
-                <Input 
-                  id="email"
-                  value={editForm.email || ''}
-                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                  className="border-stone-300"
-                />
-              </div>
-              <div>
-                <Label htmlFor="workingHours" className="text-stone-700">Working Hours</Label>
-                <Textarea 
-                  id="workingHours"
-                  value={editForm.workingHours || ''}
-                  onChange={(e) => setEditForm({...editForm, workingHours: e.target.value})}
-                  className="border-stone-300"
-                  rows={2}
-                />
+            <div className="space-y-3">
+              {/* Contact Information */}
+              <div className="space-y-3">
+                <h3 className="text-base font-medium text-stone-900">Contact Information</h3>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <Label htmlFor="address" className="text-sm text-stone-700">Address</Label>
+                    <Textarea 
+                      id="address"
+                      value={editForm.address || ''}
+                      onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                      className="border-stone-300 text-sm"
+                      rows={2}
+                      placeholder="Enter your business address"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="phone" className="text-sm text-stone-700">Phone</Label>
+                      <Input 
+                        id="phone"
+                        value={editForm.phone || ''}
+                        onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                        className="border-stone-300 text-sm"
+                        placeholder="+1 234 567 8900"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email" className="text-sm text-stone-700">Email</Label>
+                      <Input 
+                        id="email"
+                        value={editForm.email || ''}
+                        onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                        className="border-stone-300 text-sm"
+                        placeholder="contact@example.com"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="workingHours" className="text-sm text-stone-700">Working Hours</Label>
+                    <Textarea 
+                      id="workingHours"
+                      value={editForm.workingHours || ''}
+                      onChange={(e) => setEditForm({...editForm, workingHours: e.target.value})}
+                      className="border-stone-300 text-sm"
+                      rows={2}
+                      placeholder="Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"
+                    />
+                  </div>
+                </div>
               </div>
               
               {/* Social Media Links */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-stone-900">Social Media Links</h3>
+              <div className="space-y-3">
+                <h3 className="text-base font-medium text-stone-900">Social Media</h3>
                 
-                <div>
-                  <Label htmlFor="facebook" className="text-stone-700">Facebook</Label>
-                  <Input 
-                    id="facebook"
-                    placeholder="https://facebook.com/yourpage"
-                    value={editForm.socialMedia?.facebook || ''}
-                    onChange={(e) => setEditForm({
-                      ...editForm, 
-                      socialMedia: { ...editForm.socialMedia, facebook: e.target.value }
-                    })}
-                    className="border-stone-300"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="instagram" className="text-stone-700">Instagram</Label>
-                  <Input 
-                    id="instagram"
-                    placeholder="https://instagram.com/yourprofile"
-                    value={editForm.socialMedia?.instagram || ''}
-                    onChange={(e) => setEditForm({
-                      ...editForm, 
-                      socialMedia: { ...editForm.socialMedia, instagram: e.target.value }
-                    })}
-                    className="border-stone-300"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="linkedin" className="text-stone-700">LinkedIn</Label>
-                  <Input 
-                    id="linkedin"
-                    placeholder="https://linkedin.com/company/yourcompany"
-                    value={editForm.socialMedia?.linkedin || ''}
-                    onChange={(e) => setEditForm({
-                      ...editForm, 
-                      socialMedia: { ...editForm.socialMedia, linkedin: e.target.value }
-                    })}
-                    className="border-stone-300"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="twitter" className="text-stone-700">Twitter</Label>
-                  <Input 
-                    id="twitter"
-                    placeholder="https://twitter.com/yourhandle"
-                    value={editForm.socialMedia?.twitter || ''}
-                    onChange={(e) => setEditForm({
-                      ...editForm, 
-                      socialMedia: { ...editForm.socialMedia, twitter: e.target.value }
-                    })}
-                    className="border-stone-300"
-                  />
+                <div className="grid grid-cols-1 gap-2">
+                  <div>
+                    <Label htmlFor="facebook" className="text-sm text-stone-700">Facebook</Label>
+                    <Input 
+                      id="facebook"
+                      placeholder="https://facebook.com/yourpage"
+                      value={editForm.socialMedia?.facebook || ''}
+                      onChange={(e) => setEditForm({
+                        ...editForm, 
+                        socialMedia: { ...editForm.socialMedia, facebook: e.target.value }
+                      })}
+                      className="border-stone-300 text-sm"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="instagram" className="text-sm text-stone-700">Instagram</Label>
+                    <Input 
+                      id="instagram"
+                      placeholder="https://instagram.com/yourprofile"
+                      value={editForm.socialMedia?.instagram || ''}
+                      onChange={(e) => setEditForm({
+                        ...editForm, 
+                        socialMedia: { ...editForm.socialMedia, instagram: e.target.value }
+                      })}
+                      className="border-stone-300 text-sm"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="linkedin" className="text-sm text-stone-700">LinkedIn</Label>
+                    <Input 
+                      id="linkedin"
+                      placeholder="https://linkedin.com/company/yourcompany"
+                      value={editForm.socialMedia?.linkedin || ''}
+                      onChange={(e) => setEditForm({
+                        ...editForm, 
+                        socialMedia: { ...editForm.socialMedia, linkedin: e.target.value }
+                      })}
+                      className="border-stone-300 text-sm"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="twitter" className="text-sm text-stone-700">Twitter</Label>
+                    <Input 
+                      id="twitter"
+                      placeholder="https://twitter.com/yourhandle"
+                      value={editForm.socialMedia?.twitter || ''}
+                      onChange={(e) => setEditForm({
+                        ...editForm, 
+                        socialMedia: { ...editForm.socialMedia, twitter: e.target.value }
+                      })}
+                      className="border-stone-300 text-sm"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="flex gap-2">
