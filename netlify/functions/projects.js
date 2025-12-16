@@ -172,7 +172,10 @@ exports.handler = async function(event, context) {
         updateData = JSON.parse(event.body);
       }
       
-      console.log('Update data:', updateData);
+      console.log('Update data keys:', Object.keys(updateData));
+      console.log('Has previewImage:', !!updateData.previewImage);
+      console.log('Has detailBannerImage:', !!updateData.detailBannerImage);
+      console.log('Has galleryImages:', !!updateData.galleryImages);
       
       // Check if project exists
       const existingProject = await collection.findOne({ _id: new ObjectId(id) });
@@ -184,9 +187,17 @@ exports.handler = async function(event, context) {
         };
       }
       
+      // Prepare the update object with image data
+      const updateFields = {
+        ...updateData,
+        updatedAt: new Date()
+      };
+      
+      console.log('Final update fields:', Object.keys(updateFields));
+      
       const updateResult = await collection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { ...updateData, updatedAt: new Date() } }
+        { $set: updateFields }
       );
       
       console.log('Update result:', updateResult);
@@ -205,7 +216,7 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ success: true, project: updatedProject })
+        body: JSON.stringify(updatedProject)
       };
     }
 

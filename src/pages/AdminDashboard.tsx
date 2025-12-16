@@ -156,7 +156,15 @@ const AdminDashboard = () => {
   };
 
   const handleManageImages = (project: any) => {
-    setManagingImages(project);
+    console.log('Managing images for project:', project.title);
+    console.log('Current project images:', {
+      previewImage: !!project.previewImage,
+      detailBannerImage: !!project.detailBannerImage,
+      galleryImages: project.galleryImages?.length || 0
+    });
+    
+    // Create a copy of the project to manage
+    setManagingImages({ ...project });
     setIsImageModalOpen(true);
   };
 
@@ -188,24 +196,30 @@ const AdminDashboard = () => {
     
     if (!managingImages || !currentImageType) return;
     
-    // Update the managingImages state with the cropped image
-    const imageUrl = URL.createObjectURL(croppedFile);
-    
-    if (currentImageType === 'preview') {
-      setManagingImages({ ...managingImages, previewImage: imageUrl });
-    } else if (currentImageType === 'banner') {
-      setManagingImages({ ...managingImages, detailBannerImage: imageUrl });
-    } else if (currentImageType === 'gallery') {
-      const currentGallery = managingImages.galleryImages || [];
-      setManagingImages({ 
-        ...managingImages, 
-        galleryImages: [...currentGallery, imageUrl] 
-      });
-    }
-    
-    // Reset crop modal state
-    setCurrentImageForCrop(null);
-    setCurrentImageType(null);
+    // Convert file to base64 for persistent storage
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Data = event.target?.result as string;
+      console.log('Converted to base64:', base64Data.substring(0, 50) + '...');
+      
+      // Update the managingImages state with the base64 image
+      if (currentImageType === 'preview') {
+        setManagingImages({ ...managingImages, previewImage: base64Data });
+      } else if (currentImageType === 'banner') {
+        setManagingImages({ ...managingImages, detailBannerImage: base64Data });
+      } else if (currentImageType === 'gallery') {
+        const currentGallery = managingImages.galleryImages || [];
+        setManagingImages({ 
+          ...managingImages, 
+          galleryImages: [...currentGallery, base64Data] 
+        });
+      }
+      
+      // Reset crop modal state
+      setCurrentImageForCrop(null);
+      setCurrentImageType(null);
+    };
+    reader.readAsDataURL(croppedFile);
   };
 
   const getAspectRatio = (imageType: string): number => {
@@ -1110,6 +1124,14 @@ const AdminDashboard = () => {
                       src={managingImages.previewImage} 
                       alt="Current preview" 
                       className="w-full max-w-xs aspect-[4/3] object-cover rounded-lg border border-stone-200"
+                      onError={(e) => {
+                        console.error('Failed to load preview image:', e);
+                        console.log('Image src type:', typeof managingImages.previewImage);
+                        console.log('Image src length:', managingImages.previewImage?.length);
+                      }}
+                      onLoad={() => {
+                        console.log('Preview image loaded successfully');
+                      }}
                     />
                     <Button 
                       variant="outline" 
