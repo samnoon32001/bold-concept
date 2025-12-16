@@ -22,8 +22,10 @@ const AdminDashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedDetailedImages, setSelectedDetailedImages] = useState<File[]>([]);
   const [selectedIcon, setSelectedIcon] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const detailedImagesInputRef = useRef<HTMLInputElement>(null);
   const iconInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -144,6 +146,11 @@ const AdminDashboard = () => {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedImages(files);
+  };
+
+  const handleDetailedImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedDetailedImages(files);
   };
 
   const handleSaveProject = async () => {
@@ -409,7 +416,8 @@ const AdminDashboard = () => {
                               onClick={() => handleEditProject(project)}
                               className="border-stone-300 text-stone-700 hover:bg-stone-50"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit Details
                             </Button>
                             <Button 
                               variant="destructive" 
@@ -730,6 +738,25 @@ const AdminDashboard = () => {
                     {selectedImages.length} image(s) selected
                   </p>
                 )}
+              </div>
+              
+              <div>
+                <Label htmlFor="detailedImages" className="text-stone-700">Detailed Work Images (2-3 landscape images)</Label>
+                <Input 
+                  id="detailedImages"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  ref={detailedImagesInputRef}
+                  onChange={handleDetailedImageSelect}
+                  className="border-stone-300"
+                />
+                {selectedDetailedImages.length > 0 && (
+                  <p className="text-sm text-stone-600 mt-2">
+                    {selectedDetailedImages.length} detailed image(s) selected
+                  </p>
+                )}
+                <p className="text-xs text-stone-500 mt-1">Add 2-3 high-quality landscape images showing detailed work</p>
               </div>
               <div className="flex gap-2">
                 <Button 

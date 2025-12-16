@@ -13,7 +13,8 @@ export interface Project {
   title: string;
   description: string;
   category: string;
-  images: string[];
+  images: string[]; // Main project images
+  detailedImages?: string[]; // Detailed work images (2-3 landscape images)
   completionDate: string;
   location: string;
   client?: string;

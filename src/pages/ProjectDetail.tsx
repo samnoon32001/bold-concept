@@ -135,6 +135,7 @@ const ProjectDetail = () => {
 
               {/* Gallery */}
               <div className="space-y-6">
+                <h3 className="text-lg font-medium text-foreground mb-4">Project Gallery</h3>
                 {project.images.slice(1).map((image, index) => (
                   <motion.div
                     key={index}
@@ -151,6 +152,30 @@ const ProjectDetail = () => {
                   </motion.div>
                 ))}
               </div>
+              
+              {/* Detailed Work Images Section */}
+              {project.detailedImages && project.detailedImages.length > 0 && (
+                <div className="mt-12 space-y-6">
+                  <h3 className="text-lg font-medium text-foreground mb-4">Detailed Work</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {project.detailedImages.map((image, index) => (
+                      <motion.div
+                        key={`detailed-${index}`}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: index * 0.15 }}
+                      >
+                        <img
+                          src={image}
+                          alt={`${project.title} - Detailed Work ${index + 1}`}
+                          className="w-full aspect-[16/9] object-cover rounded-lg"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
