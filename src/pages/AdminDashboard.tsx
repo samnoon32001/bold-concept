@@ -156,30 +156,25 @@ const AdminDashboard = () => {
         return;
       }
       
-      // Create FormData for file upload
-      const formData = new FormData();
-      
-      // Add all form fields with proper validation
-      Object.keys(editForm).forEach(key => {
-        if (key !== 'images' && editForm[key] !== undefined && editForm[key] !== null) {
-          formData.append(key, editForm[key]);
-        }
-      });
-      
-      // Add images if selected
-      selectedImages.forEach((image, index) => {
-        formData.append(`images`, image);
-      });
+      // For Netlify compatibility, send JSON instead of FormData
+      // File uploads will need to be handled separately with a service like AWS S3
+      const projectData = {
+        ...editForm,
+        // For now, keep existing images or use empty array
+        images: editingProject?.images || [],
+        // Convert boolean fields properly
+        featured: editForm.featured === true || editForm.featured === 'true'
+      };
       
       console.log('Saving project:', editingProject);
-      console.log('Form data entries:', Array.from(formData.entries()));
+      console.log('Project data:', projectData);
       
       if (editingProject && editingProject._id) {
         // Update existing project
-        await api.updateProject(editingProject._id, formData, token);
+        await api.updateProject(editingProject._id, projectData, token);
       } else {
         // Create new project
-        await api.createProject(formData, token);
+        await api.createProject(projectData, token);
       }
       
       setIsEditModalOpen(false);

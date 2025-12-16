@@ -74,27 +74,35 @@ export const api = {
     return response.json();
   },
 
-  async createProject(projectData: FormData, token: string): Promise<Project> {
+  async createProject(projectData: any, token: string): Promise<Project> {
     const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: projectData,
+      body: JSON.stringify(projectData),
     });
-    if (!response.ok) throw new Error('Failed to create project');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to create project');
+    }
     return response.json();
   },
 
-  async updateProject(id: string, projectData: FormData, token: string): Promise<boolean> {
+  async updateProject(id: string, projectData: any, token: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: projectData,
+      body: JSON.stringify(projectData),
     });
-    if (!response.ok) throw new Error('Failed to update project');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update project');
+    }
     return response.json();
   },
 
