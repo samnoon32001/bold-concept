@@ -168,6 +168,7 @@ const AdminDashboard = () => {
       
       console.log('Saving project:', editingProject);
       console.log('Project data:', projectData);
+      console.log('Data type:', typeof projectData);
       
       if (editingProject && editingProject._id) {
         // Update existing project
@@ -198,32 +199,27 @@ const AdminDashboard = () => {
         return;
       }
       
-      // Create FormData for file upload
-      const formData = new FormData();
-      
-      // Add all form fields with proper validation
-      Object.keys(editForm).forEach(key => {
-        if (key !== 'icon' && editForm[key] !== undefined && editForm[key] !== null) {
-          formData.append(key, editForm[key]);
-        }
-      });
-      
-      // Add icon if selected
-      if (selectedIcon) {
-        formData.append('icon', selectedIcon);
-      } else if (editForm.icon) {
-        formData.append('icon', editForm.icon);
-      }
+      // For Netlify compatibility, send JSON instead of FormData
+      const serviceData = {
+        ...editForm,
+        // Convert arrays and booleans properly
+        features: Array.isArray(editForm.features) ? editForm.features : [],
+        order: parseInt(editForm.order) || 0,
+        active: editForm.active === true || editForm.active === 'true',
+        // Keep existing icon or use empty string
+        icon: selectedIcon ? 'new-icon-uploaded' : (editForm.icon || '')
+      };
       
       console.log('Saving service:', editingService);
-      console.log('Form data entries:', Array.from(formData.entries()));
+      console.log('Service data:', serviceData);
+      console.log('Data type:', typeof serviceData);
       
       if (editingService && editingService._id) {
         // Update existing service
-        await api.updateService(editingService._id, formData, token);
+        await api.updateService(editingService._id, serviceData, token);
       } else {
         // Create new service
-        await api.createService(formData, token);
+        await api.createService(serviceData, token);
       }
       
       setIsEditModalOpen(false);

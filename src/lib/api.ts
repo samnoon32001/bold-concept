@@ -137,27 +137,35 @@ export const api = {
     return response.json();
   },
 
-  async createService(serviceData: FormData, token: string): Promise<Service> {
+  async createService(serviceData: any, token: string): Promise<Service> {
     const response = await fetch(`${API_BASE_URL}/services`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: serviceData,
+      body: JSON.stringify(serviceData),
     });
-    if (!response.ok) throw new Error('Failed to create service');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to create service');
+    }
     return response.json();
   },
 
-  async updateService(id: string, serviceData: FormData, token: string): Promise<boolean> {
+  async updateService(id: string, serviceData: any, token: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_URL}/services/${id}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: serviceData,
+      body: JSON.stringify(serviceData),
     });
-    if (!response.ok) throw new Error('Failed to update service');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update service');
+    }
     return response.json();
   },
 
