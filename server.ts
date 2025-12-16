@@ -306,10 +306,14 @@ app.get('/api/services', async (req, res) => {
   }
 });
 
-app.post('/api/services', authenticateToken, async (req: any, res: any) => {
+app.post('/api/services', authenticateToken, upload.single('icon'), async (req: any, res: any) => {
   try {
     const serviceData = {
       ...req.body,
+      icon: req.file ? `/uploads/${req.file.filename}` : req.body.icon || '',
+      features: req.body.features ? JSON.parse(req.body.features) : [],
+      order: parseInt(req.body.order) || 0,
+      active: req.body.active === 'true' || req.body.active === true,
       createdAt: new Date(),
       updatedAt: new Date()
     };

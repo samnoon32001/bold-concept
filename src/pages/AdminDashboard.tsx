@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings, X, Save, Eye, Users, BarChart3, TrendingUp } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -73,7 +73,9 @@ const AdminDashboard = () => {
   };
 
   const handleAddProject = () => {
-    setEditingProject(null);
+    setEditingService(null);
+    setEditingWebsiteContact(false);
+    setEditingProject({ _id: null }); // Use object with null _id for add mode
     setEditForm({
       title: '',
       description: '',
@@ -83,6 +85,7 @@ const AdminDashboard = () => {
       client: '',
       featured: false
     });
+    setSelectedImages([]);
     setIsEditModalOpen(true);
   };
 
@@ -99,6 +102,22 @@ const AdminDashboard = () => {
       client: project.client || '',
       featured: project.featured || false
     });
+    setIsEditModalOpen(true);
+  };
+
+  const handleAddService = () => {
+    setEditingProject(null);
+    setEditingWebsiteContact(false);
+    setEditingService({ _id: null }); // Use object with null _id for add mode
+    setEditForm({
+      title: '',
+      description: '',
+      icon: '',
+      features: [],
+      order: 0,
+      active: true
+    });
+    setSelectedIcon(null);
     setIsEditModalOpen(true);
   };
 
@@ -146,7 +165,7 @@ const AdminDashboard = () => {
         formData.append(`images`, image);
       });
       
-      if (editingProject) {
+      if (editingProject && editingProject._id) {
         // Update existing project
         await api.updateProject(editingProject._id, formData, token);
       } else {
@@ -164,7 +183,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpdateService = async () => {
+  const handleSaveService = async () => {
     try {
       const token = localStorage.getItem('token');
       
@@ -185,14 +204,21 @@ const AdminDashboard = () => {
         formData.append('icon', editForm.icon);
       }
       
-      await api.updateService(editingService._id, formData, token);
+      if (editingService && editingService._id) {
+        // Update existing service
+        await api.updateService(editingService._id, formData, token);
+      } else {
+        // Create new service
+        await api.createService(formData, token);
+      }
+      
       setIsEditModalOpen(false);
       setEditingService(null);
       setEditForm({});
       setSelectedIcon(null);
       fetchData();
     } catch (error) {
-      console.error('Failed to update service:', error);
+      console.error('Failed to save service:', error);
     }
   };
 
@@ -347,7 +373,7 @@ const AdminDashboard = () => {
               <h2 className="text-2xl font-serif text-stone-900">Manage Projects</h2>
               <Button 
                 onClick={handleAddProject}
-                className="bg-stone-800 hover:bg-stone-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Project
@@ -407,7 +433,10 @@ const AdminDashboard = () => {
           <TabsContent value="services" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-serif text-stone-900">Manage Services</h2>
-              <Button className="bg-stone-800 hover:bg-stone-700 text-white">
+              <Button 
+                onClick={handleAddService}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Service
               </Button>
@@ -462,7 +491,7 @@ const AdminDashboard = () => {
               <h2 className="text-2xl font-serif text-stone-900">Website Contact Information</h2>
               <Button 
                 onClick={handleEditWebsiteContact}
-                className="bg-stone-800 hover:bg-stone-700 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Contact Info
@@ -554,8 +583,11 @@ const AdminDashboard = () => {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif text-stone-900">
-              {editingProject ? (editingProject._id ? 'Edit Project' : 'Add Project') : editingService ? 'Edit Service' : 'Edit Website Contact'}
+              {editingProject ? (editingProject._id ? 'Edit Project' : 'Add Project') : editingService ? (editingService._id ? 'Edit Service' : 'Add Service') : 'Edit Website Contact'}
             </DialogTitle>
+            <DialogDescription>
+              {editingProject ? (editingProject._id ? 'Edit the project details below.' : 'Add a new project by filling in the details below.') : editingService ? (editingService._id ? 'Edit the service details below.' : 'Add a new service by filling in the details below.') : 'Edit the website contact information below.'}
+            </DialogDescription>
           </DialogHeader>
           
           {editingProject && (
@@ -662,7 +694,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex gap-2">
                 <Button 
-                  onClick={handleUpdateService}
+                  onClick={handleSaveService}
                   className="bg-stone-800 hover:bg-stone-700 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />

@@ -129,14 +129,13 @@ export const api = {
     return response.json();
   },
 
-  async createService(serviceData: Partial<Service>, token: string): Promise<Service> {
+  async createService(serviceData: FormData, token: string): Promise<Service> {
     const response = await fetch(`${API_BASE_URL}/services`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify(serviceData),
+      body: serviceData,
     });
     if (!response.ok) throw new Error('Failed to create service');
     return response.json();
