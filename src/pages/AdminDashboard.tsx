@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api, Project, Service, Contact } from '@/lib/api';
+import { useDataCache } from '@/hooks/useDataCache';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +37,7 @@ const AdminDashboard = () => {
   const detailedImagesInputRef = useRef<HTMLInputElement>(null);
   const iconInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { invalidateCache } = useDataCache();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -280,6 +283,9 @@ const AdminDashboard = () => {
       ));
       
       // Show success feedback
+      // Invalidate cache to refresh frontend data
+      invalidateCache('projects');
+      
       alert('Images saved successfully!');
       setIsImageModalOpen(false);
       
@@ -333,15 +339,16 @@ const AdminDashboard = () => {
         // Update existing project
         await api.updateProject(editingProject._id, projectData, token);
       } else {
-        // Create new project
-        await api.createProject(projectData, token);
+        fetchData();
       }
+      
+      // Invalidate cache to refresh frontend data
+      invalidateCache('projects');
       
       setIsEditModalOpen(false);
       setEditingProject(null);
       setEditForm({});
       setSelectedImages([]);
-      fetchData();
     } catch (error) {
       console.error('Failed to save project:', error);
       alert(`Failed to save project: ${error.message || 'Unknown error'}`);
@@ -381,11 +388,15 @@ const AdminDashboard = () => {
         await api.createService(serviceData, token);
       }
       
+      fetchData();
+      
+      // Invalidate cache to refresh frontend data
+      invalidateCache('services');
+      
       setIsEditModalOpen(false);
       setEditingService(null);
       setEditForm({});
       setSelectedIcon(null);
-      fetchData();
     } catch (error) {
       console.error('Failed to save service:', error);
       alert(`Failed to save service: ${error.message || 'Unknown error'}`);
@@ -416,10 +427,14 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await api.updateWebsiteContact(editForm, token);
+      fetchData();
+      
+      // Invalidate cache to refresh frontend data
+      invalidateCache('websiteContact');
+      
       setIsEditModalOpen(false);
       setEditingWebsiteContact(false);
       setEditForm({});
-      fetchData();
     } catch (error) {
       console.error('Failed to update website contact:', error);
     }

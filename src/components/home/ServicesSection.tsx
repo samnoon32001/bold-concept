@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Building2, Paintbrush, Hammer, FolderKanban, Drill, Settings, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api, Service } from "@/lib/api";
+import { useDataCache } from "@/hooks/useDataCache";
 
 const iconMap = {
   Building2,
@@ -17,11 +18,12 @@ const iconMap = {
 export const ServicesSection = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getCachedServices } = useDataCache();
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const data = await api.getServices();
+        const data = await getCachedServices();
         setServices(data);
       } catch (error) {
         console.error('Failed to fetch services:', error);
@@ -31,7 +33,7 @@ export const ServicesSection = () => {
     };
 
     fetchServices();
-  }, []);
+  }, [getCachedServices]);
   return (
     <section id="services" className="py-24 md:py-32 bg-background">
       <div className="container-custom">

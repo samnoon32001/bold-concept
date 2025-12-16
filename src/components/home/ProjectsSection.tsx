@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { api, Project } from "@/lib/api";
+import { useDataCache } from "@/hooks/useDataCache";
 
 const categories = ["All", "Residential", "Commercial", "Hospitality", "Retail", "Renovation"];
 
@@ -11,11 +12,12 @@ export const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const { getCachedProjects, cacheStatus } = useDataCache();
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await api.getProjects();
+        const data = await getCachedProjects();
         setProjects(data);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
@@ -25,7 +27,7 @@ export const ProjectsSection = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [getCachedProjects]);
 
   const filteredProjects = selectedCategory === "All" 
     ? projects 

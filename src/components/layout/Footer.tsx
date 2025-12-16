@@ -2,15 +2,17 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Linkedin, Facebook } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { useDataCache } from "@/hooks/useDataCache";
 
 export const Footer = () => {
   const [websiteContact, setWebsiteContact] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { getCachedWebsiteContact } = useDataCache();
 
   useEffect(() => {
     const fetchWebsiteContact = async () => {
       try {
-        const data = await api.getWebsiteContact();
+        const data = await getCachedWebsiteContact();
         setWebsiteContact(data);
       } catch (error) {
         console.error('Failed to fetch website contact:', error);
@@ -20,7 +22,7 @@ export const Footer = () => {
     };
 
     fetchWebsiteContact();
-  }, []);
+  }, [getCachedWebsiteContact]);
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-custom py-16 md:py-24">
