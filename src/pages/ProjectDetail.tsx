@@ -61,12 +61,12 @@ const ProjectDetail = () => {
     );
   }
 
-  // Map project data to the expected format
+  // Map project data to the expected format with fallbacks
   const mappedProject = {
     ...project,
-    year: new Date(project.createdAt).getFullYear().toString(),
-    area: 'Custom Size', // This could be added to the backend schema
-    scope: [
+    year: project.year || (project.completionDate ? new Date(project.completionDate).getFullYear().toString() : new Date(project.createdAt).getFullYear().toString()),
+    area: project.area || 'Custom Size', // Fallback if not specified
+    scope: project.scope || [
       'Complete Interior Fit-Out',
       'Custom Joinery',
       'MEP Coordination',

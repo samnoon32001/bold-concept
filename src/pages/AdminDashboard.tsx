@@ -630,6 +630,90 @@ const AdminDashboard = () => {
                   className="border-stone-300"
                 />
               </div>
+              
+              {/* Enhanced Project Detail Fields */}
+              <div>
+                <Label htmlFor="location" className="text-stone-700">Location</Label>
+                <Input 
+                  id="location"
+                  value={editForm.location || ''}
+                  onChange={(e) => setEditForm({...editForm, location: e.target.value})}
+                  className="border-stone-300"
+                  placeholder="e.g., Business Bay, Dubai"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="completionDate" className="text-stone-700">Completion Date</Label>
+                <Input 
+                  id="completionDate"
+                  type="date"
+                  value={editForm.completionDate || ''}
+                  onChange={(e) => setEditForm({...editForm, completionDate: e.target.value})}
+                  className="border-stone-300"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="area" className="text-stone-700">Project Area</Label>
+                <Input 
+                  id="area"
+                  value={editForm.area || ''}
+                  onChange={(e) => setEditForm({...editForm, area: e.target.value})}
+                  className="border-stone-300"
+                  placeholder="e.g., 15,000 sq ft"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="client" className="text-stone-700">Client (Optional)</Label>
+                <Input 
+                  id="client"
+                  value={editForm.client || ''}
+                  onChange={(e) => setEditForm({...editForm, client: e.target.value})}
+                  className="border-stone-300"
+                  placeholder="e.g., ABC Corporation"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="scope" className="text-stone-700">Scope of Work</Label>
+                <Textarea 
+                  id="scope"
+                  value={editForm.scope ? editForm.scope.join('\n') : ''}
+                  onChange={(e) => setEditForm({...editForm, scope: e.target.value.split('\n').filter(item => item.trim())})}
+                  className="border-stone-300"
+                  rows={4}
+                  placeholder="Enter each scope item on a new line:\nComplete Interior Fit-Out\nCustom Joinery\nMEP Coordination"
+                />
+                <p className="text-xs text-stone-500 mt-1">Enter each scope item on a new line</p>
+              </div>
+              
+              <div>
+                <Label htmlFor="status" className="text-stone-700">Status</Label>
+                <select 
+                  id="status"
+                  value={editForm.status || 'completed'}
+                  onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                  className="w-full px-3 py-2 border border-stone-300 rounded-md text-sm"
+                >
+                  <option value="completed">Completed</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="planning">Planning</option>
+                  <option value="on-hold">On Hold</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={editForm.featured === true || editForm.featured === 'true'}
+                  onChange={(e) => setEditForm({...editForm, featured: e.target.checked})}
+                  className="border-stone-300"
+                />
+                <Label htmlFor="featured" className="text-stone-700">Featured Project</Label>
+              </div>
               <div>
                 <Label htmlFor="images" className="text-stone-700">Project Images</Label>
                 <Input 

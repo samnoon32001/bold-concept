@@ -19,6 +19,10 @@ export interface Project {
   client?: string;
   featured: boolean;
   status: string;
+  // Enhanced fields for project detail pages
+  scope?: string[]; // Scope of work items
+  area?: string; // Project size (e.g., "15,000 sq ft")
+  year?: string; // Project year (can be derived from completionDate)
   createdAt: string;
   updatedAt: string;
 }
