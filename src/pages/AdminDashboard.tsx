@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings, X, Save, Eye, Users, BarChart3, TrendingUp } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings, X, Save, Eye, Users, BarChart3, TrendingUp, Image as ImageIcon } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
@@ -19,7 +19,9 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [editingService, setEditingService] = useState(null);
   const [editingWebsiteContact, setEditingWebsiteContact] = useState(false);
+  const [managingImages, setManagingImages] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedDetailedImages, setSelectedDetailedImages] = useState<File[]>([]);
@@ -151,6 +153,11 @@ const AdminDashboard = () => {
   const handleDetailedImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedDetailedImages(files);
+  };
+
+  const handleManageImages = (project: any) => {
+    setManagingImages(project);
+    setIsImageModalOpen(true);
   };
 
   const handleSaveProject = async () => {
@@ -418,6 +425,15 @@ const AdminDashboard = () => {
                             >
                               <Edit className="w-4 h-4 mr-1" />
                               Edit Details
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleManageImages(project)}
+                              className="border-green-300 text-green-700 hover:bg-green-50"
+                            >
+                              <ImageIcon className="w-4 h-4 mr-1" />
+                              Manage Images
                             </Button>
                             <Button 
                               variant="destructive" 
@@ -722,42 +738,6 @@ const AdminDashboard = () => {
                 />
                 <Label htmlFor="featured" className="text-stone-700">Featured Project</Label>
               </div>
-              <div>
-                <Label htmlFor="images" className="text-stone-700">Project Images</Label>
-                <Input 
-                  id="images"
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleImageSelect}
-                  className="border-stone-300"
-                />
-                {selectedImages.length > 0 && (
-                  <p className="text-sm text-stone-600 mt-2">
-                    {selectedImages.length} image(s) selected
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="detailedImages" className="text-stone-700">Detailed Work Images (2-3 landscape images)</Label>
-                <Input 
-                  id="detailedImages"
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  ref={detailedImagesInputRef}
-                  onChange={handleDetailedImageSelect}
-                  className="border-stone-300"
-                />
-                {selectedDetailedImages.length > 0 && (
-                  <p className="text-sm text-stone-600 mt-2">
-                    {selectedDetailedImages.length} detailed image(s) selected
-                  </p>
-                )}
-                <p className="text-xs text-stone-500 mt-1">Add 2-3 high-quality landscape images showing detailed work</p>
-              </div>
               <div className="flex gap-2">
                 <Button 
                   onClick={handleSaveProject}
@@ -963,6 +943,161 @@ const AdminDashboard = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsEditModalOpen(false)}
+                  className="border-stone-300 text-stone-700"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Upload Modal */}
+      <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-serif text-stone-900">
+              Manage Images - {managingImages?.title}
+            </DialogTitle>
+            <DialogDescription>
+              Upload and manage images for different sections of the project.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {managingImages && (
+            <div className="space-y-6">
+              {/* Preview Image for Home Screen */}
+              <div className="space-y-3">
+                <h3 className="text-base font-medium text-stone-900">Preview Image (Home Screen)</h3>
+                <p className="text-sm text-stone-600">This image appears as a thumbnail on the home/projects listing. Recommended ratio: 4:3</p>
+                
+                {managingImages.previewImage ? (
+                  <div className="space-y-2">
+                    <img 
+                      src={managingImages.previewImage} 
+                      alt="Current preview" 
+                      className="w-full max-w-xs aspect-[4/3] object-cover rounded-lg border border-stone-200"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600 border-red-300 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Remove Preview Image
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Input 
+                      type="file"
+                      accept="image/*"
+                      className="border-stone-300"
+                      placeholder="Upload preview image (4:3 ratio)"
+                    />
+                    <p className="text-xs text-stone-500 mt-1">Upload an image with 4:3 aspect ratio for best results</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Detail Banner Image */}
+              <div className="space-y-3">
+                <h3 className="text-base font-medium text-stone-900">Detail Banner Image</h3>
+                <p className="text-sm text-stone-600">This wide image appears at the top of the project detail page. Recommended ratio: 16:9</p>
+                
+                {managingImages.detailBannerImage ? (
+                  <div className="space-y-2">
+                    <img 
+                      src={managingImages.detailBannerImage} 
+                      alt="Current banner" 
+                      className="w-full aspect-[16/9] object-cover rounded-lg border border-stone-200"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600 border-red-300 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Remove Banner Image
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Input 
+                      type="file"
+                      accept="image/*"
+                      className="border-stone-300"
+                      placeholder="Upload banner image (16:9 ratio)"
+                    />
+                    <p className="text-xs text-stone-500 mt-1">Upload a wide image with 16:9 aspect ratio for the project header</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Gallery Images */}
+              <div className="space-y-3">
+                <h3 className="text-base font-medium text-stone-900">Gallery Images (Optional)</h3>
+                <p className="text-sm text-stone-600">These images appear in the project gallery section. Recommended ratio: 16:10</p>
+                
+                {managingImages.galleryImages && managingImages.galleryImages.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      {managingImages.galleryImages.map((image: string, index: number) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={image} 
+                            alt={`Gallery ${index + 1}`} 
+                            className="w-full aspect-[16/10] object-cover rounded-lg border border-stone-200"
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 text-white border-red-600 hover:bg-red-700"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    {managingImages.galleryImages.length < 3 && (
+                      <div>
+                        <Input 
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="border-stone-300"
+                          placeholder="Add more gallery images (up to 3 total)"
+                        />
+                        <p className="text-xs text-stone-500 mt-1">Upload up to 3 images with 16:10 aspect ratio</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <Input 
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="border-stone-300"
+                      placeholder="Upload gallery images (16:10 ratio)"
+                    />
+                    <p className="text-xs text-stone-500 mt-1">Upload 2-3 images with 16:10 aspect ratio for the project gallery</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex gap-2 pt-4 border-t border-stone-200">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Images
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsImageModalOpen(false)}
                   className="border-stone-300 text-stone-700"
                 >
                   <X className="w-4 h-4 mr-2" />

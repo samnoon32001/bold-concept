@@ -79,7 +79,7 @@ export const ProjectsSection = () => {
                     className="group block relative aspect-[4/3] overflow-hidden"
                   >
                     <img
-                      src={project.images[0]}
+                      src={project.previewImage || project.images?.[0] || '/placeholder-project.jpg'}
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

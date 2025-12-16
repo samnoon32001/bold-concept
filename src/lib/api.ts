@@ -13,17 +13,22 @@ export interface Project {
   title: string;
   description: string;
   category: string;
-  images: string[]; // Main project images
-  detailedImages?: string[]; // Detailed work images (2-3 landscape images)
+  // New image structure
+  previewImage?: string; // Home screen thumbnail (aspect ratio: 4/3)
+  detailBannerImage?: string; // Project detail page header (aspect ratio: 16/9)
+  galleryImages?: string[]; // Optional gallery images (2-3 images, aspect ratio: 16/10)
+  // Legacy fields for backward compatibility
+  images?: string[]; // Will be migrated to new structure
+  detailedImages?: string[]; // Will be migrated to galleryImages
+  // Other fields
   completionDate: string;
   location: string;
   client?: string;
   featured: boolean;
   status: string;
-  // Enhanced fields for project detail pages
-  scope?: string[]; // Scope of work items
-  area?: string; // Project size (e.g., "15,000 sq ft")
-  year?: string; // Project year (can be derived from completionDate)
+  scope?: string[];
+  area?: string;
+  year?: string;
   createdAt: string;
   updatedAt: string;
 }

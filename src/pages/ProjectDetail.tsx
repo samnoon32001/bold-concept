@@ -80,7 +80,7 @@ const ProjectDetail = () => {
       <section className="relative h-[60vh] min-h-[500px] flex items-end">
         <div className="absolute inset-0">
           <img
-            src={project.images[0]}
+            src={project.detailBannerImage || project.images?.[0] || '/placeholder-project.jpg'}
             alt={project.title}
             className="w-full h-full object-cover"
           />
@@ -136,7 +136,8 @@ const ProjectDetail = () => {
               {/* Gallery */}
               <div className="space-y-6">
                 <h3 className="text-lg font-medium text-foreground mb-4">Project Gallery</h3>
-                {project.images.slice(1).map((image, index) => (
+                {/* Use new galleryImages structure with fallback to legacy images */}
+                {(project.galleryImages || project.images?.slice(1))?.map((image, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 30 }}
@@ -153,7 +154,7 @@ const ProjectDetail = () => {
                 ))}
               </div>
               
-              {/* Detailed Work Images Section */}
+              {/* Legacy Detailed Work Images Section - will be migrated to galleryImages */}
               {project.detailedImages && project.detailedImages.length > 0 && (
                 <div className="mt-12 space-y-6">
                   <h3 className="text-lg font-medium text-foreground mb-4">Detailed Work</h3>
