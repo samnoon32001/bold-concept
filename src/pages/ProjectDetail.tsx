@@ -83,6 +83,7 @@ const ProjectDetail = () => {
             src={project.detailBannerImage || project.images?.[0] || '/placeholder-project.jpg'}
             alt={project.title}
             className="w-full h-full object-cover"
+            style={{ aspectRatio: '19/5' }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
         </div>

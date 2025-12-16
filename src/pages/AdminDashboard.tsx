@@ -227,7 +227,7 @@ const AdminDashboard = () => {
       case 'preview':
         return 4/3; // Home screen preview
       case 'banner':
-        return 16/9; // Detail page banner
+        return 19/5; // Detail page banner (updated from 16:9)
       case 'gallery':
         return 16/10; // Gallery images
       default:
@@ -1160,14 +1160,14 @@ const AdminDashboard = () => {
               {/* Detail Banner Image */}
               <div className="space-y-3">
                 <h3 className="text-base font-medium text-stone-900">Detail Banner Image</h3>
-                <p className="text-sm text-stone-600">This wide image appears at the top of the project detail page. Recommended ratio: 16:9</p>
+                <p className="text-sm text-stone-600">This wide image appears at the top of the project detail page. Recommended ratio: 19:5</p>
                 
                 {managingImages.detailBannerImage ? (
                   <div className="space-y-2">
                     <img 
                       src={managingImages.detailBannerImage} 
                       alt="Current banner" 
-                      className="w-full aspect-[16/9] object-cover rounded-lg border border-stone-200"
+                      className="w-full aspect-[19/5] object-cover rounded-lg border border-stone-200"
                     />
                     <Button 
                       variant="outline" 
@@ -1186,9 +1186,9 @@ const AdminDashboard = () => {
                       accept="image/*"
                       onChange={(e) => handleImageSelect(e, 'banner')}
                       className="border-stone-300"
-                      placeholder="Upload banner image (16:9 ratio)"
+                      placeholder="Upload banner image (19:5 ratio)"
                     />
-                    <p className="text-xs text-stone-500 mt-1">Upload a wide image with 16:9 aspect ratio for the project header</p>
+                    <p className="text-xs text-stone-500 mt-1">Upload a wide image with 19:5 aspect ratio for the project header</p>
                   </div>
                 )}
               </div>
