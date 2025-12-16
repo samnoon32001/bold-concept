@@ -25,15 +25,15 @@ const isCacheValid = <T>(cacheItem: CacheItem<T> | undefined): boolean => {
   return Date.now() - cacheItem.timestamp < cacheItem.ttl;
 };
 
-const setCacheItem = <T>(key: keyof DataCache, data: T): void => {
+const setCacheItem = <K extends keyof DataCache>(key: K, data: DataCache[K]['data']): void => {
   cache[key] = {
     data,
     timestamp: Date.now(),
     ttl: CACHE_TTL[key]
-  };
+  } as CacheItem<DataCache[K]['data']>;
 };
 
-const getCacheItem = <T>(key: keyof DataCache): T | null => {
+const getCacheItem = <K extends keyof DataCache>(key: K): DataCache[K]['data'] | null => {
   const cacheItem = cache[key];
   if (isCacheValid(cacheItem)) {
     return cacheItem?.data || null;
