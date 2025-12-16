@@ -1,4 +1,5 @@
-import { useParams, Link, useEffect, useState } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Ruler, Building } from "lucide-react";
