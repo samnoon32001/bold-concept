@@ -150,12 +150,18 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       
+      // Validate required fields
+      if (!editForm.title || !editForm.description || !editForm.category) {
+        alert('Please fill in all required fields (Title, Description, Category)');
+        return;
+      }
+      
       // Create FormData for file upload
       const formData = new FormData();
       
-      // Add all form fields
+      // Add all form fields with proper validation
       Object.keys(editForm).forEach(key => {
-        if (key !== 'images') {
+        if (key !== 'images' && editForm[key] !== undefined && editForm[key] !== null) {
           formData.append(key, editForm[key]);
         }
       });
@@ -164,6 +170,9 @@ const AdminDashboard = () => {
       selectedImages.forEach((image, index) => {
         formData.append(`images`, image);
       });
+      
+      console.log('Saving project:', editingProject);
+      console.log('Form data entries:', Array.from(formData.entries()));
       
       if (editingProject && editingProject._id) {
         // Update existing project
@@ -180,6 +189,7 @@ const AdminDashboard = () => {
       fetchData();
     } catch (error) {
       console.error('Failed to save project:', error);
+      alert(`Failed to save project: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -187,12 +197,18 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       
+      // Validate required fields
+      if (!editForm.title || !editForm.description) {
+        alert('Please fill in all required fields (Title, Description)');
+        return;
+      }
+      
       // Create FormData for file upload
       const formData = new FormData();
       
-      // Add all form fields
+      // Add all form fields with proper validation
       Object.keys(editForm).forEach(key => {
-        if (key !== 'icon') {
+        if (key !== 'icon' && editForm[key] !== undefined && editForm[key] !== null) {
           formData.append(key, editForm[key]);
         }
       });
@@ -203,6 +219,9 @@ const AdminDashboard = () => {
       } else if (editForm.icon) {
         formData.append('icon', editForm.icon);
       }
+      
+      console.log('Saving service:', editingService);
+      console.log('Form data entries:', Array.from(formData.entries()));
       
       if (editingService && editingService._id) {
         // Update existing service
@@ -219,6 +238,7 @@ const AdminDashboard = () => {
       fetchData();
     } catch (error) {
       console.error('Failed to save service:', error);
+      alert(`Failed to save service: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -639,7 +659,7 @@ const AdminDashboard = () => {
               <div className="flex gap-2">
                 <Button 
                   onClick={handleSaveProject}
-                  className="bg-stone-800 hover:bg-stone-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
@@ -695,7 +715,7 @@ const AdminDashboard = () => {
               <div className="flex gap-2">
                 <Button 
                   onClick={handleSaveService}
-                  className="bg-stone-800 hover:bg-stone-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
@@ -755,7 +775,7 @@ const AdminDashboard = () => {
               <div className="flex gap-2">
                 <Button 
                   onClick={handleUpdateWebsiteContact}
-                  className="bg-stone-800 hover:bg-stone-700 text-white"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes

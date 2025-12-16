@@ -240,20 +240,45 @@ app.post('/api/projects', authenticateToken, upload.array('images'), async (req:
 app.put('/api/projects/:id', authenticateToken, upload.array('images'), async (req: any, res: any) => {
   try {
     const { id } = req.params;
+    console.log('Updating project with ID:', id);
+    console.log('Request body:', req.body);
+    console.log('Files:', req.files);
+    
+    // Validate ObjectId
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid project ID format' });
+    }
+    
     const updateData = {
       ...req.body,
       images: req.files ? (req.files as Express.Multer.File[]).map((file: any) => `/uploads/${file.filename}`) : [],
       updatedAt: new Date()
     };
     
+    // Remove undefined fields to prevent issues
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined || updateData[key] === 'undefined') {
+        delete updateData[key];
+      }
+    });
+    
+    console.log('Update data:', updateData);
+    
     const result = await db.collection('projects').updateOne(
       { _id: new ObjectId(id) },
       { $set: updateData }
     );
     
+    console.log('Update result:', result);
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
     res.json({ success: result.modifiedCount > 0 });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update project' });
+    console.error('Error updating project:', error);
+    res.status(500).json({ error: 'Failed to update project', details: error.message });
   }
 });
 
