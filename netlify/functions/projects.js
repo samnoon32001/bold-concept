@@ -65,6 +65,7 @@ exports.handler = async function(event, context) {
 
     console.log('=== NETLIFY PROJECTS DEBUG ===');
     console.log('HTTP Method:', event.httpMethod);
+    console.log('Path:', event.path);
     console.log('Path Parameters:', event.pathParameters);
     console.log('Headers:', Object.keys(event.headers));
     console.log('Body type:', typeof event.body);
@@ -105,7 +106,13 @@ exports.handler = async function(event, context) {
     }
 
     if (event.httpMethod === 'PUT') {
-      const { id } = event.pathParameters || {};
+      // Try to get ID from path parameters first, then from path
+      let id = event.pathParameters?.id;
+      
+      if (!id && event.path) {
+        const pathParts = event.path.split('/');
+        id = pathParts[pathParts.length - 1];
+      }
       
       console.log('Update ID:', id);
       console.log('ID type:', typeof id);

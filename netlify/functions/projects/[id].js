@@ -65,15 +65,22 @@ exports.handler = async function(event, context) {
 
     console.log('=== NETLIFY PROJECT [ID] DEBUG ===');
     console.log('HTTP Method:', event.httpMethod);
+    console.log('Path:', event.path);
     console.log('Path Parameters:', event.pathParameters);
     console.log('Headers:', Object.keys(event.headers));
     console.log('Body type:', typeof event.body);
     console.log('Is base64 encoded:', event.isBase64Encoded);
 
-    // Get ID from path parameters
-    const id = event.pathParameters?.id;
+    // Get ID from path - try multiple methods
+    let id = event.pathParameters?.id;
     
-    console.log('Update ID:', id);
+    // If not in pathParameters, try to extract from path
+    if (!id && event.path) {
+      const pathParts = event.path.split('/');
+      id = pathParts[pathParts.length - 1]; // Get last part of path
+    }
+    
+    console.log('Extracted ID:', id);
     console.log('ID type:', typeof id);
     console.log('ObjectId.isValid result:', ObjectId.isValid(id));
     
