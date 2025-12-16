@@ -150,11 +150,6 @@ const AdminDashboard = () => {
     setSelectedIcon(file);
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedImages(files);
-  };
-
   const handleDetailedImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedDetailedImages(files);
