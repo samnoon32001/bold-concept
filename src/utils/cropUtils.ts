@@ -11,27 +11,54 @@ export const getCroppedImg = async (
     throw new Error('No 2d context');
   }
 
-  const maxSize = Math.max(image.width, image.height);
-  const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
-
-  // set canvas size to match the cropped area
+  // Set canvas size to match the cropped area
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
 
-  // translate canvas context to the center of the cropped area
+  // Calculate the scale to fit the entire image in the crop area
+  const scaleX = image.width / image.naturalWidth;
+  const scaleY = image.height / image.naturalHeight;
+  
+  // Clear canvas with white background to prevent transparency
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Save the context state
+  ctx.save();
+  
+  // Move to center of canvas
   ctx.translate(canvas.width / 2, canvas.height / 2);
   
-  // rotate the context
+  // Apply rotation
   ctx.rotate((rotation * Math.PI) / 180);
-
-  // draw the image
+  
+  // Calculate the source rectangle with proper scaling
+  const sourceX = (pixelCrop.x / scaleX);
+  const sourceY = (pixelCrop.y / scaleY);
+  const sourceWidth = (pixelCrop.width / scaleX);
+  const sourceHeight = (pixelCrop.height / scaleY);
+  
+  // Ensure source dimensions don't exceed image boundaries
+  const clampedSourceX = Math.max(0, Math.min(sourceX, image.naturalWidth - sourceWidth));
+  const clampedSourceY = Math.max(0, Math.min(sourceY, image.naturalHeight - sourceHeight));
+  const clampedSourceWidth = Math.min(sourceWidth, image.naturalWidth - clampedSourceX);
+  const clampedSourceHeight = Math.min(sourceHeight, image.naturalHeight - clampedSourceY);
+  
+  // Draw the image with proper source and destination rectangles
   ctx.drawImage(
     image,
-    pixelCrop.x - image.width / 2,
-    pixelCrop.y - image.height / 2,
-    image.width,
-    image.height
+    clampedSourceX,
+    clampedSourceY,
+    clampedSourceWidth,
+    clampedSourceHeight,
+    -pixelCrop.width / 2,
+    -pixelCrop.height / 2,
+    pixelCrop.width,
+    pixelCrop.height
   );
+  
+  // Restore the context state
+  ctx.restore();
 
   // Convert canvas to blob and then to File
   return new Promise((resolve) => {
@@ -45,7 +72,7 @@ export const getCroppedImg = async (
         resolve(file);
       },
       'image/jpeg',
-      1
+      0.95 // Slightly reduce quality for better performance
     );
   });
 };

@@ -77,6 +77,10 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
               onCropChange={onCropChange}
               onCropComplete={onCropCompleteHandler}
               onZoomChange={onZoomChange}
+              restrictPosition={true}
+              minZoom={0.5}
+              maxZoom={3}
+              objectFit="contain"
             />
           </div>
           
@@ -84,7 +88,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
             <label className="text-sm font-medium">Zoom: {Math.round(zoom * 100)}%</label>
             <input
               type="range"
-              min={1}
+              min={0.5}
               max={3}
               step={0.1}
               value={zoom}
