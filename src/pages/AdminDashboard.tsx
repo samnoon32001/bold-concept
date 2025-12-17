@@ -111,7 +111,10 @@ const AdminDashboard = () => {
       status: project.status,
       location: project.location,
       client: project.client || '',
-      featured: project.featured || false
+      featured: project.featured || false,
+      area: project.area || '',
+      completionDate: project.completionDate || '',
+      scope: project.scope || []
     });
     setIsEditModalOpen(true);
   };
