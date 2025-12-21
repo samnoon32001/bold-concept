@@ -12,6 +12,78 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, LogOut, FolderOpen, MessageSquare, Settings, X, Save, Eye, Users, BarChart3, TrendingUp, Image as ImageIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ImageCropModal } from '@/components/ImageCropModal';
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2 } from "lucide-react";
+
+// Skeleton Loader Components
+const ProjectSkeleton = () => (
+  <motion.div 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="bg-white rounded-lg border border-stone-200 p-6 space-y-4"
+  >
+    <div className="flex items-center justify-between">
+      <div className="space-y-2">
+        <div className="h-6 bg-stone-200 rounded w-3/4 animate-pulse"></div>
+        <div className="h-4 bg-stone-200 rounded w-1/2 animate-pulse"></div>
+      </div>
+      <div className="flex gap-2">
+        <div className="h-8 w-8 bg-stone-200 rounded animate-pulse"></div>
+        <div className="h-8 w-8 bg-stone-200 rounded animate-pulse"></div>
+        <div className="h-8 w-8 bg-stone-200 rounded animate-pulse"></div>
+      </div>
+    </div>
+    <div className="h-20 bg-stone-200 rounded animate-pulse"></div>
+    <div className="flex gap-2">
+      <div className="h-6 bg-stone-200 rounded w-20 animate-pulse"></div>
+      <div className="h-6 bg-stone-200 rounded w-16 animate-pulse"></div>
+      <div className="h-6 bg-stone-200 rounded w-24 animate-pulse"></div>
+    </div>
+  </motion.div>
+);
+
+const ServiceSkeleton = () => (
+  <motion.div 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="bg-white rounded-lg border border-stone-200 p-6 space-y-4"
+  >
+    <div className="flex items-center justify-between">
+      <div className="space-y-2">
+        <div className="h-6 bg-stone-200 rounded w-2/3 animate-pulse"></div>
+        <div className="h-16 w-16 bg-stone-200 rounded-full animate-pulse"></div>
+      </div>
+      <div className="flex gap-2">
+        <div className="h-8 w-8 bg-stone-200 rounded animate-pulse"></div>
+        <div className="h-8 w-8 bg-stone-200 rounded animate-pulse"></div>
+      </div>
+    </div>
+    <div className="h-16 bg-stone-200 rounded animate-pulse"></div>
+    <div className="space-y-2">
+      <div className="h-4 bg-stone-200 rounded w-full animate-pulse"></div>
+      <div className="h-4 bg-stone-200 rounded w-3/4 animate-pulse"></div>
+      <div className="h-4 bg-stone-200 rounded w-1/2 animate-pulse"></div>
+    </div>
+  </motion.div>
+);
+
+const LoadingSpinner = ({ size = "sm" }: { size?: "sm" | "md" | "lg" }) => {
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-6 h-6", 
+    lg: "w-8 h-8"
+  };
+  
+  return (
+    <motion.div
+      initial={{ rotate: 0 }}
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+    >
+      <Loader2 className={`${sizeClasses[size]} animate-spin`} />
+    </motion.div>
+  );
+};
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -38,6 +110,17 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { invalidateCache } = useDataCache();
 
+  // Loading states
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(false);
+  const [isServicesLoading, setIsServicesLoading] = useState(false);
+  const [isWebsiteContactLoading, setIsWebsiteContactLoading] = useState(false);
+  const [isSavingProject, setIsSavingProject] = useState(false);
+  const [isSavingService, setIsSavingService] = useState(false);
+  const [isSavingWebsiteContact, setIsSavingWebsiteContact] = useState(false);
+  const [isDeletingProject, setIsDeletingProject] = useState<string | null>(null);
+  const [isDeletingService, setIsDeletingService] = useState<string | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -50,11 +133,23 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
+      setIsInitialLoading(true);
       const token = localStorage.getItem('token');
+      
+      // Simulate smooth loading with staggered timing
       const [projectsRes, servicesRes, websiteContactRes] = await Promise.all([
-        api.getProjects(),
-        api.getServices(),
-        api.getWebsiteContact(),
+        api.getProjects().then(res => {
+          setTimeout(() => setIsProjectsLoading(false), 300);
+          return res;
+        }),
+        api.getServices().then(res => {
+          setTimeout(() => setIsServicesLoading(false), 600);
+          return res;
+        }),
+        api.getWebsiteContact().then(res => {
+          setTimeout(() => setIsWebsiteContactLoading(false), 900);
+          return res;
+        }),
       ]);
 
       setProjects(projectsRes);
@@ -62,6 +157,11 @@ const AdminDashboard = () => {
       setWebsiteContact(websiteContactRes);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+    } finally {
+      setIsInitialLoading(false);
+      setIsProjectsLoading(false);
+      setIsServicesLoading(false);
+      setIsWebsiteContactLoading(false);
     }
   };
 
@@ -74,11 +174,14 @@ const AdminDashboard = () => {
   const handleDeleteProject = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
+        setIsDeletingProject(id);
         const token = localStorage.getItem('token');
         await api.deleteProject(id, token);
         fetchData();
       } catch (error) {
         console.error('Failed to delete project:', error);
+      } finally {
+        setIsDeletingProject(null);
       }
     }
   };
@@ -86,11 +189,14 @@ const AdminDashboard = () => {
   const handleDeleteService = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this service?')) {
       try {
+        setIsDeletingService(id);
         const token = localStorage.getItem('token');
         await api.deleteService(id, token);
         fetchData();
       } catch (error) {
         console.error('Failed to delete service:', error);
+      } finally {
+        setIsDeletingService(null);
       }
     }
   };
@@ -325,6 +431,7 @@ const AdminDashboard = () => {
 
   const handleSaveProject = async () => {
     try {
+      setIsSavingProject(true);
       const token = localStorage.getItem('token');
       
       // Validate required fields
@@ -368,11 +475,14 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Failed to save project:', error);
       alert(`Failed to save project: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsSavingProject(false);
     }
   };
 
   const handleSaveService = async () => {
     try {
+      setIsSavingService(true);
       const token = localStorage.getItem('token');
       
       // Validate required fields
@@ -381,7 +491,6 @@ const AdminDashboard = () => {
         return;
       }
       
-      // For Netlify compatibility, send JSON instead of FormData
       const serviceData = {
         ...editForm,
         // Convert arrays and booleans properly
@@ -389,7 +498,7 @@ const AdminDashboard = () => {
         order: parseInt(editForm.order) || 0,
         active: editForm.active === true || editForm.active === 'true',
         // Keep existing icon or use empty string
-        icon: selectedIcon ? 'new-icon-uploaded' : (editForm.icon || '')
+        icon: editingService?.icon || ''
       };
       
       console.log('Saving service:', editingService);
@@ -404,6 +513,7 @@ const AdminDashboard = () => {
         await api.createService(serviceData, token);
       }
       
+      // Refresh data to show updated list
       fetchData();
       
       // Invalidate cache to refresh frontend data
@@ -416,6 +526,8 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Failed to save service:', error);
       alert(`Failed to save service: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsSavingService(false);
     }
   };
 
@@ -582,13 +694,31 @@ const AdminDashboard = () => {
             </div>
             
             <div className="grid gap-6">
-              {projects.map((project: any) => (
-                <Card key={project._id} className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className=" usable">
-                      <div className="flex-1">
+              {isProjectsLoading ? (
+                // Show skeleton loaders while loading
+                Array.from({ length: 3 }).map((_, index) => (
+                  <motion.div
+                    key={`skeleton-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <ProjectSkeleton />
+                  </motion.div>
+                ))
+              ) : (
+                // Show actual projects when loaded
+                projects.map((project: any) => (
+                  <motion.div
+                    key={project._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-4">
-                          <div>
+                          <div className="flex-1">
                             <h3 className="text-xl font-serif font-semibold text-stone-900">{project.title}</h3>
                             <p className="text-stone-600 mt-1">{project.description}</p>
                           </div>
@@ -598,6 +728,7 @@ const AdminDashboard = () => {
                               size="sm" 
                               onClick={() => handleEditProject(project)}
                               className="border-stone-300 text-stone-700 hover:bg-stone-50"
+                              disabled={isDeletingProject === project._id}
                             >
                               <Edit className="w-4 h-4 mr-1" />
                               Edit Details
@@ -607,6 +738,7 @@ const AdminDashboard = () => {
                               size="sm" 
                               onClick={() => handleManageImages(project)}
                               className="border-green-300 text-green-700 hover:bg-green-50"
+                              disabled={isDeletingProject === project._id}
                             >
                               <ImageIcon className="w-4 h-4 mr-1" />
                               Manage Images
@@ -616,8 +748,13 @@ const AdminDashboard = () => {
                               size="sm"
                               onClick={() => handleDeleteProject(project._id)}
                               className="bg-red-600 hover:bg-red-700"
+                              disabled={isDeletingProject === project._id}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              {isDeletingProject === project._id ? (
+                                <LoadingSpinner size="sm" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
                             </Button>
                           </div>
                         </div>
@@ -626,6 +763,20 @@ const AdminDashboard = () => {
                             {project.status}
                           </span>
                           <span className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
+                            {project.location}
+                          </span>
+                          {project.featured && (
+                            <span className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))
+              )}
+            </div>
                             {project.location}
                           </span>
                         </div>
@@ -651,17 +802,98 @@ const AdminDashboard = () => {
             </div>
             
             <div className="grid gap-4">
-              {services.map((service: any) => (
-                <Card key={service._id} className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 bg-stone-200 rounded-lg flex items-center justify-center">
-                            <Settings className="w-5 h-5 text-stone-600" />
-                          </div>
+              {isServicesLoading ? (
+                // Show skeleton loaders while loading
+                Array.from({ length: 3 }).map((_, index) => (
+                  <motion.div
+                    key={`service-skeleton-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <ServiceSkeleton />
+                  </motion.div>
+                ))
+              ) : (
+                // Show actual services when loaded
+                services.map((service: any) => (
+                  <motion.div
+                    key={service._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-stone-900">{service.title}</h3>
+                            <div className="flex items-start gap-4">
+                              <div className="w-10 h-10 bg-stone-200 rounded-lg flex items-center justify-center">
+                                <Settings className="w-5 h-5 text-stone-600" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-stone-900">{service.title}</h3>
+                                <p className="text-stone-600 mt-1">{service.description}</p>
+                                <div className="mt-3">
+                                  <div className="flex flex-wrap gap-1">
+                                    {service.features?.slice(0, 3).map((feature: string, idx: number) => (
+                                      <span key={idx} className="text-xs bg-stone-100 text-stone-700 px-2 py-1 rounded">
+                                        {feature}
+                                      </span>
+                                    ))}
+                                    {service.features?.length > 3 && (
+                                      <span className="text-xs bg-stone-100 text-stone-700 px-2 py-1 rounded">
+                                        +{service.features.length - 3} more
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleEditService(service)}
+                              className="border-stone-300 text-stone-700 hover:bg-stone-50"
+                              disabled={isDeletingService === service._id}
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteService(service._id)}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={isDeletingService === service._id}
+                            >
+                              {isDeletingService === service._id ? (
+                                <LoadingSpinner size="sm" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 mt-4 text-sm text-stone-500">
+                          <span className="flex items-center gap-1">
+                            {service.active ? (
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            ) : (
+                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            )}
+                            {service.active ? 'Active' : 'Inactive'}
+                          </span>
+                          <span>Order: {service.order}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))
+              )}
+            </div>
                             <p className="text-stone-600 mt-1">{service.description}</p>
                             <div className="flex items-center gap-2 mt-2">
                               <span className={`px-2 py-1 text-xs rounded-full ${
@@ -914,14 +1146,25 @@ const AdminDashboard = () => {
                 <Button 
                   onClick={handleSaveProject}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                  disabled={isSavingProject}
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  {isSavingProject ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setIsEditModalOpen(false)}
                   className="border-stone-300 text-stone-700"
+                  disabled={isSavingProject}
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancel
@@ -981,14 +1224,25 @@ const AdminDashboard = () => {
                 <Button 
                   onClick={handleSaveService}
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                  disabled={isSavingService}
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  {isSavingService ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setIsEditModalOpen(false)}
                   className="border-stone-300 text-stone-700"
+                  disabled={isSavingService}
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancel
