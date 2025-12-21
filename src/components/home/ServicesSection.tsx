@@ -59,10 +59,10 @@ export const ServicesSection = () => {
                   className="group"
                 >
                   <div className="p-8 border border-border hover:border-secondary transition-colors duration-300 h-full">
-                    <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-secondary transition-colors duration-300">
+                    <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
                       {IconComponent && <IconComponent className="w-8 h-8 text-secondary" />}
                     </div>
-                    <h3 className="font-serif text-xl text-foreground mb-4">{service.title}</h3>
+                    <h3 className="font-serif text-xl text-foreground mb-4 group-hover:text-secondary transition-colors duration-300">{service.title}</h3>
                     <p className="text-muted-foreground mb-6">{service.description}</p>
                     <ul className="space-y-2 mb-6">
                       {service.features.map((feature, idx) => (
