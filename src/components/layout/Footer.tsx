@@ -32,7 +32,7 @@ export const Footer = () => {
             <Link to="/" className="inline-block mb-6">
               <div className="flex items-center gap-3">
                 <img 
-                  src="https://i.pinimg.com/736x/e2/ca/42/e2ca427df080d14e17b6f6314c2d8dd2.jpg" 
+                  src="https://i.pinimg.com/736x/7c/e3/56/7ce3569977d0efd63a9a99a0c7356975.jpg" 
                   alt="BOLD CONCEPTS Logo" 
                   className="w-12 h-12 rounded-full border-2 border-primary-foreground/20 object-cover"
                 />

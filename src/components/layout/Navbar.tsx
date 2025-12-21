@@ -106,7 +106,7 @@ export const Navbar = () => {
                 isScrolled || !isHomePage ? "text-primary-foreground" : "text-white"
               }`}>
                 <img 
-                  src="https://i.pinimg.com/736x/e2/ca/42/e2ca427df080d14e17b6f6314c2d8dd2.jpg" 
+                  src="https://i.pinimg.com/736x/7c/e3/56/7ce3569977d0efd63a9a99a0c7356975.jpg" 
                   alt="BOLD CONCEPTS Logo" 
                   className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-current object-cover"
                 />
