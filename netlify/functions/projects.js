@@ -98,7 +98,10 @@ exports.handler = async function(event, context) {
       }
       
       // Get all projects
+      console.log('=== GETTING ALL PROJECTS ===');
       const projects = await collection.find({}).toArray();
+      console.log('Found projects count:', projects.length);
+      console.log('Project IDs:', projects.map(p => p._id));
       return {
         statusCode: 200,
         headers,
@@ -107,6 +110,11 @@ exports.handler = async function(event, context) {
     }
 
     if (event.httpMethod === 'POST') {
+      console.log('=== PROJECT CREATION DEBUG ===');
+      console.log('Content-Type:', event.headers['content-type']);
+      console.log('Body:', event.body);
+      console.log('Body length:', event.body?.length);
+      
       // Handle FormData for file uploads
       let projectData;
       
@@ -118,11 +126,20 @@ exports.handler = async function(event, context) {
         projectData = JSON.parse(event.body);
       }
       
+      console.log('Parsed project data:', projectData);
+      console.log('Project data keys:', Object.keys(projectData));
+      
       const result = await collection.insertOne({
         ...projectData,
         createdAt: new Date(),
         updatedAt: new Date()
       });
+      
+      console.log('Insert result:', result);
+      console.log('Inserted ID:', result.insertedId);
+      
+      const insertedProject = await collection.findOne({ _id: result.insertedId });
+      console.log('Verified inserted project:', insertedProject);
       
       return {
         statusCode: 200,
