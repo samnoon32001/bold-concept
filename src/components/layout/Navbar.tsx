@@ -102,15 +102,22 @@ export const Navbar = () => {
               className="relative z-10"
               onClick={() => isHomePage && scrollToSection("hero")}
             >
-              <div className={`transition-colors duration-300 ${
+              <div className={`flex items-center gap-3 transition-colors duration-300 ${
                 isScrolled || !isHomePage ? "text-primary-foreground" : "text-white"
               }`}>
-                <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wide">
-                  BOLD CONC<span className="text-red-600">E</span>PTS
-                </h1>
-                <p className="text-xs md:text-sm font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-                  TECHNICAL SERVICES LLC
-                </p>
+                <img 
+                  src="https://i.pinimg.com/736x/e2/ca/42/e2ca427df080d14e17b6f6314c2d8dd2.jpg" 
+                  alt="BOLD CONCEPTS Logo" 
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-current object-cover"
+                />
+                <div>
+                  <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wide">
+                    BOLD CONC<span className="text-red-600">E</span>PTS
+                  </h1>
+                  <p className="text-xs md:text-sm font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                    TECHNICAL SERVICES LLC
+                  </p>
+                </div>
               </div>
             </Link>
 

@@ -30,13 +30,20 @@ export const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-6">
-              <div>
-                <h2 className="font-serif text-2xl font-bold tracking-wide">
-                  BOLD CONC<span className="text-red-600">E</span>PTS
-                </h2>
-                <p className="text-xs font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-                  TECHNICAL SERVICES LLC
-                </p>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="https://i.pinimg.com/736x/e2/ca/42/e2ca427df080d14e17b6f6314c2d8dd2.jpg" 
+                  alt="BOLD CONCEPTS Logo" 
+                  className="w-12 h-12 rounded-full border-2 border-primary-foreground/20 object-cover"
+                />
+                <div>
+                  <h2 className="font-serif text-2xl font-bold tracking-wide">
+                    BOLD CONC<span className="text-red-600">E</span>PTS
+                  </h2>
+                  <p className="text-xs font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                    TECHNICAL SERVICES LLC
+                  </p>
+                </div>
               </div>
             </Link>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-6">
