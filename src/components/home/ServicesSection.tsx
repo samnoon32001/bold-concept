@@ -23,7 +23,7 @@ export const ServicesSection = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const data = await getCachedServices();
+        const data = await getCachedServices() as Service[];
         setServices(data);
       } catch (error) {
         console.error('Failed to fetch services:', error);
