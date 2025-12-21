@@ -64,6 +64,28 @@ exports.handler = async function(event, context) {
       };
     }
 
+    if (email === 'projects@boldconcepts-ts.com' && password === '123') {
+      const token = jwt.sign(
+        { email, role: 'admin' },
+        jwtSecret,
+        { expiresIn: '24h' }
+      );
+
+      console.log('Admin login successful');
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          message: 'Login successful',
+          token,
+          user: { email, role: 'admin' }
+        })
+      };
+    }
+
     // For other users, check database (you can implement this later)
     const client = new MongoClient(uri);
     await client.connect();

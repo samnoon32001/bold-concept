@@ -120,6 +120,15 @@ const AdminDashboard = () => {
   const [isSavingWebsiteContact, setIsSavingWebsiteContact] = useState(false);
   const [isDeletingProject, setIsDeletingProject] = useState<string | null>(null);
   const [isDeletingService, setIsDeletingService] = useState<string | null>(null);
+  
+  // Password change state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -169,6 +178,60 @@ const AdminDashboard = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      setIsChangingPassword(true);
+      
+      // Validate passwords
+      if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+        alert('Please fill in all password fields');
+        return;
+      }
+      
+      if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+        alert('New password and confirmation do not match');
+        return;
+      }
+      
+      if (passwordForm.newPassword.length < 6) {
+        alert('New password must be at least 6 characters long');
+        return;
+      }
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch('/.netlify/functions/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(data.message);
+        setIsPasswordModalOpen(false);
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      } else {
+        alert(data.error || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Password change error:', error);
+      alert('Failed to change password. Please try again.');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleDeleteProject = async (id: string) => {
@@ -589,10 +652,20 @@ const AdminDashboard = () => {
             </div>
             <h1 className="text-2xl font-serif font-bold text-stone-900">BOLD CONCEPT Admin</h1>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="border-stone-300 text-stone-700 hover:bg-stone-50">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setIsPasswordModalOpen(true)}
+              variant="outline" 
+              className="border-stone-300 text-stone-700 hover:bg-stone-50"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Change Password
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="border-stone-300 text-stone-700 hover:bg-stone-50">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -1559,6 +1632,81 @@ const AdminDashboard = () => {
         aspectRatio={currentImageType ? getAspectRatio(currentImageType) : 1}
         title={currentImageType ? getImageTitle(currentImageType) : 'Image'}
       />
+
+      {/* Password Change Modal */}
+      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-serif text-stone-900">Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and a new password to update your credentials.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="currentPassword" className="text-stone-700">Current Password</Label>
+              <Input 
+                id="currentPassword"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                className="border-stone-300"
+                placeholder="Enter current password"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="newPassword" className="text-stone-700">New Password</Label>
+              <Input 
+                id="newPassword"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                className="border-stone-300"
+                placeholder="Enter new password (min 6 characters)"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="confirmPassword" className="text-stone-700">Confirm New Password</Label>
+              <Input 
+                id="confirmPassword"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                className="border-stone-300"
+                placeholder="Confirm new password"
+              />
+            </div>
+          </div>
+          
+          <div className="flex gap-2 pt-4">
+            <Button 
+              onClick={handleChangePassword}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              disabled={isChangingPassword}
+            >
+              {isChangingPassword ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Changing...
+                </>
+              ) : (
+                'Change Password'
+              )}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsPasswordModalOpen(false)}
+              className="border-stone-300 text-stone-700"
+              disabled={isChangingPassword}
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
