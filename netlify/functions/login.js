@@ -64,7 +64,7 @@ exports.handler = async function(event, context) {
       };
     }
 
-    if (email === 'projects@boldconcepts-ts.com' && password === '123') {
+    if (email === 'hallo@boldconcepts-ts.com' && password === '123') {
       const token = jwt.sign(
         { email, role: 'admin' },
         jwtSecret,

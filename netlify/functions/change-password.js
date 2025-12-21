@@ -52,7 +52,7 @@ exports.handler = async function(event, context) {
     // For hardcoded admin accounts, we can't actually change the password
     // This would need to be implemented with a database or environment variables
     // For now, we'll return a message indicating this limitation
-    if (userEmail === 'samnoon3200@gmail.com' || userEmail === 'projects@boldconcepts-ts.com') {
+    if (userEmail === 'samnoon3200@gmail.com' || userEmail === 'hallo@boldconcepts-ts.com') {
       return {
         statusCode: 200,
         headers: {
