@@ -12,7 +12,6 @@ export interface Project {
   _id?: string;
   title: string;
   description: string;
-  category: string;
   // New image structure
   previewImage?: string; // Home screen thumbnail (aspect ratio: 4/3)
   detailBannerImage?: string; // Project detail page header (aspect ratio: 16/9)

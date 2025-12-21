@@ -102,7 +102,6 @@ const AdminDashboard = () => {
     setEditForm({
       title: '',
       description: '',
-      category: '',
       status: 'ongoing',
       location: '',
       client: '',
@@ -119,7 +118,6 @@ const AdminDashboard = () => {
     setEditForm({
       title: project.title,
       description: project.description,
-      category: project.category,
       status: project.status,
       location: project.location,
       client: project.client || '',
@@ -330,8 +328,8 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       
       // Validate required fields
-      if (!editForm.title || !editForm.description || !editForm.category) {
-        alert('Please fill in all required fields (Title, Description, Category)');
+      if (!editForm.title || !editForm.description) {
+        alert('Please fill in all required fields (Title, Description)');
         return;
       }
       
@@ -553,7 +551,7 @@ const AdminDashboard = () => {
                       <div key={project._id} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
                         <div>
                           <h4 className="font-medium text-stone-900">{project.title}</h4>
-                          <p className="text-sm text-stone-600">{project.category}</p>
+                          <p className="text-sm text-stone-600">{project.location}</p>
                         </div>
                         <span className="px-2 py-1 text-xs rounded-full bg-stone-200 text-stone-700">
                           {project.status}
@@ -620,9 +618,6 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 text-sm bg-stone-100 text-stone-700 rounded-full">
-                            {project.category}
-                          </span>
                           <span className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
                             {project.status}
                           </span>
@@ -824,15 +819,6 @@ const AdminDashboard = () => {
                   id="description"
                   value={editForm.description || ''}
                   onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                  className="border-stone-300"
-                />
-              </div>
-              <div>
-                <Label htmlFor="category" className="text-stone-700">Category</Label>
-                <Input 
-                  id="category"
-                  value={editForm.category || ''}
-                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
                   className="border-stone-300"
                 />
               </div>
