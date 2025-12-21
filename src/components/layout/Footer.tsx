@@ -32,7 +32,7 @@ export const Footer = () => {
             <Link to="/" className="inline-block mb-6">
               <div>
                 <h2 className="font-serif text-2xl font-bold tracking-wide">
-                  BOLD<span className="text-red-600">E</span> CONCEPTS
+                  BOLD CONC<span className="text-red-600">E</span>PTS
                 </h2>
                 <p className="text-xs font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
                   TECHNICAL SERVICES LLC
