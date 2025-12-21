@@ -60,7 +60,16 @@ export const ServicesSection = () => {
                 >
                   <div className="p-8 border border-border hover:border-secondary transition-colors duration-300 h-full">
                     <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
-                      {IconComponent && <IconComponent className="w-8 h-8 text-secondary" />}
+                      {service.icon && service.icon.startsWith('http') ? (
+                        <img 
+                          src={service.icon} 
+                          alt={service.title}
+                          className="w-8 h-8 object-cover filter brightness-0 saturate-100"
+                          style={{ filter: 'invert(42%) sepia(89%) saturate(1946%) hue-rotate(326deg) brightness(96%) contrast(96%)' }}
+                        />
+                      ) : (
+                        IconComponent && <IconComponent className="w-8 h-8 text-secondary" />
+                      )}
                     </div>
                     <h3 className="font-serif text-xl text-foreground mb-4 group-hover:text-secondary transition-colors duration-300">{service.title}</h3>
                     <p className="text-muted-foreground mb-6">{service.description}</p>

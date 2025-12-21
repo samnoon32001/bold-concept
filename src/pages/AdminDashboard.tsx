@@ -951,6 +951,17 @@ const AdminDashboard = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="service-features" className="text-stone-700">Features/Subservices (one per line)</Label>
+                <Textarea 
+                  id="service-features"
+                  value={Array.isArray(editForm.features) ? editForm.features.join('\n') : (editForm.features || '')}
+                  onChange={(e) => setEditForm({...editForm, features: e.target.value.split('\n').filter(f => f.trim())})}
+                  placeholder="Enter each feature or subservice on a new line"
+                  className="border-stone-300"
+                  rows={4}
+                />
+              </div>
+              <div>
                 <Label htmlFor="service-icon" className="text-stone-700">Service Icon</Label>
                 <Input 
                   id="service-icon"
