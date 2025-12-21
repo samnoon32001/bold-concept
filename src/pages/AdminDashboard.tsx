@@ -777,15 +777,6 @@ const AdminDashboard = () => {
                 ))
               )}
             </div>
-                            {project.location}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </TabsContent>
 
           {/* Services Tab */}
@@ -893,43 +884,6 @@ const AdminDashboard = () => {
                   </motion.div>
                 ))
               )}
-            </div>
-                            <p className="text-stone-600 mt-1">{service.description}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className={`px-2 py-1 text-xs rounded-full ${
-                                service.active 
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-stone-100 text-stone-700'
-                              }`}>
-                                {service.active ? 'Active' : 'Inactive'}
-                              </span>
-                              <span className="text-sm text-stone-600">Order: {service.order}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEditService(service)}
-                          className="border-stone-300 text-stone-700 hover:bg-stone-50"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleDeleteService(service._id)}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           </TabsContent>
 
