@@ -50,15 +50,13 @@ export const AboutSection = () => {
             </h2>
             <div className="space-y-6 text-body">
               <p>
-                BOLD CONCEPT Technical Service was founded on the belief that exceptional 
-                interior spaces are born from the perfect union of technical expertise and 
-                creative vision. Based in Dubai, we have established ourselves as leaders 
-                in premium interior fit-out and renovation services.
+                Bold Concepts is a UAE-based design, interior fit-out, and technical services company specializing in turnkey commercial, residential, retail, and F&B fit-out projects. Known for delivering high-end interior fit-out solutions and MEP engineering services, we integrate design innovation, technical expertise, and professional project management to create refined, functional, and compliant spaces across the UAE.
               </p>
               <p>
-                From luxurious residential interiors to sophisticated commercial spaces, 
-                every project we undertake reflects our passion for excellence and our 
-                commitment to transforming visions into reality.
+                Our comprehensive services include bespoke interior fit-out execution, MEP installations, maintenance services, and specialized technical solutions, delivered through a structured and results-driven project management approach. We collaborate closely with clients, consultants, and contractors to ensure seamless coordination, on-time delivery, cost efficiency, and superior quality.
+              </p>
+              <p>
+                Committed to quality, safety, and operational excellence, our experienced team applies industry best practices and premium materials to deliver durable, high-performance environments. With a clear vision to set benchmarks in the UAE interior fit-out and technical services industry, we are driven by a mission to deliver sophisticated spaces through precision, innovation, and a client-focused approach—building long-term partnerships based on trust, integrity, and consistent performance.
               </p>
             </div>
           </motion.div>
