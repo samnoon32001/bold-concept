@@ -645,65 +645,71 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-stone-50">
       {/* Header */}
       <header className="border-b border-stone-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-stone-600 to-stone-800 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
+        <div className="container mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-stone-600 to-stone-800 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm sm:text-lg">B</span>
+              </div>
+              <h1 className="text-lg sm:text-2xl font-serif font-bold text-stone-900">BOLD CONCEPT Admin</h1>
             </div>
-            <h1 className="text-2xl font-serif font-bold text-stone-900">BOLD CONCEPT Admin</h1>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              onClick={() => setIsPasswordModalOpen(true)}
-              variant="outline" 
-              className="border-stone-300 text-stone-700 hover:bg-stone-50"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Change Password
-            </Button>
-            <Button onClick={handleLogout} variant="outline" className="border-stone-300 text-stone-700 hover:bg-stone-50">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Button 
+                onClick={() => setIsPasswordModalOpen(true)}
+                variant="outline" 
+                className="border-stone-300 text-stone-700 hover:bg-stone-50 text-sm sm:text-base"
+              >
+                <Settings className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Change Password</span>
+                <span className="sm:hidden">Password</span>
+              </Button>
+              <Button onClick={handleLogout} variant="outline" className="border-stone-300 text-stone-700 hover:bg-stone-50 text-sm sm:text-base">
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+                <span className="sm:hidden">Exit</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-stone-600">Total Projects</p>
-                  <p className="text-3xl font-bold text-stone-900 mt-2">{stats.totalProjects}</p>
+                <div className="flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-stone-600">Total Projects</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 mt-1 sm:mt-2">{stats.totalProjects}</p>
                 </div>
-                <FolderOpen className="w-8 h-8 text-stone-400" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-stone-100 rounded-lg flex items-center justify-center">
+                  <span className="text-stone-400 font-bold text-sm">PJ</span>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-stone-600">Active Services</p>
-                  <p className="text-3xl font-bold text-stone-900 mt-2">{stats.activeServices}</p>
+                <div className="flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-stone-600">Active Services</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 mt-1 sm:mt-2">{stats.activeServices}</p>
                 </div>
-                <Settings className="w-8 h-8 text-stone-400" />
+                <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-stone-400" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-stone-600">Completed</p>
-                  <p className="text-3xl font-bold text-stone-900 mt-2">{stats.completedProjects}</p>
+                <div className="flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-stone-600">Completed</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 mt-1 sm:mt-2">{stats.completedProjects}</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-stone-400" />
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-stone-400" />
               </div>
             </CardContent>
           </Card>
@@ -711,22 +717,26 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-stone-100 border border-stone-200">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Overview
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-stone-100 border border-stone-200">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3">
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Overview</span>
+              <span className="sm:hidden">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="projects" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
-              <FolderOpen className="w-4 h-4 mr-2" />
-              Projects
+            <TabsTrigger value="projects" className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3">
+              <FolderOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Projects</span>
+              <span className="sm:hidden">Projects</span>
             </TabsTrigger>
-            <TabsTrigger value="services" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
-              <Settings className="w-4 h-4 mr-2" />
-              Services
+            <TabsTrigger value="services" className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Services</span>
+              <span className="sm:hidden">Services</span>
             </TabsTrigger>
-            <TabsTrigger value="website-contact" className="data-[state=active]:bg-white data-[state=active]:text-stone-900">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Website Contact
+            <TabsTrigger value="website-contact" className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3">
+              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Website Contact</span>
+              <span className="sm:hidden">Contact</span>
             </TabsTrigger>
           </TabsList>
 
@@ -758,11 +768,11 @@ const AdminDashboard = () => {
 
           {/* Projects Tab */}
           <TabsContent value="projects" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-serif text-stone-900">Manage Projects</h2>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <h2 className="text-xl sm:text-2xl font-serif text-stone-900">Manage Projects</h2>
               <Button 
                 onClick={handleAddProject}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Project
@@ -792,11 +802,11 @@ const AdminDashboard = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Card className="border-stone-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
                           <div className="flex-1">
-                            <h3 className="text-xl font-serif font-semibold text-stone-900">{project.title}</h3>
-                            <p className="text-stone-600 mt-1">{project.description}</p>
+                            <h3 className="text-lg sm:text-xl font-serif font-semibold text-stone-900">{project.title}</h3>
+                            <p className="text-stone-600 mt-1 text-sm sm:text-base">{project.description}</p>
                             {project.scope && project.scope.length > 0 && (
                               <div className="mt-3">
                                 <p className="text-sm font-medium text-stone-700 mb-2">Scope of Work:</p>
@@ -815,51 +825,57 @@ const AdminDashboard = () => {
                               </div>
                             )}
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2 lg:flex-col lg:gap-2">
                             <Button 
                               variant="outline" 
                               size="sm" 
                               onClick={() => handleEditProject(project)}
-                              className="border-stone-300 text-stone-700 hover:bg-stone-50"
+                              className="border-stone-300 text-stone-700 hover:bg-stone-50 text-xs sm:text-sm"
                               disabled={isDeletingProject === project._id}
                             >
-                              <Edit className="w-4 h-4 mr-1" />
-                              Edit Details
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Edit Details</span>
+                              <span className="sm:hidden">Edit</span>
                             </Button>
                             <Button 
                               variant="outline" 
                               size="sm" 
                               onClick={() => handleManageImages(project)}
-                              className="border-green-300 text-green-700 hover:bg-green-50"
+                              className="border-green-300 text-green-700 hover:bg-green-50 text-xs sm:text-sm"
                               disabled={isDeletingProject === project._id}
                             >
-                              <ImageIcon className="w-4 h-4 mr-1" />
-                              Manage Images
+                              <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Manage Images</span>
+                              <span className="sm:hidden">Images</span>
                             </Button>
                             <Button 
                               variant="destructive" 
                               size="sm"
                               onClick={() => handleDeleteProject(project._id)}
-                              className="bg-red-600 hover:bg-red-700"
+                              className="bg-red-600 hover:bg-red-700 text-xs sm:text-sm"
                               disabled={isDeletingProject === project._id}
                             >
                               {isDeletingProject === project._id ? (
                                 <LoadingSpinner size="sm" />
                               ) : (
-                                <Trash2 className="w-4 h-4" />
+                                <>
+                                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                                  <span className="hidden sm:inline">Delete</span>
+                                  <span className="sm:hidden">Del</span>
+                                </>
                               )}
                             </Button>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+                          <span className="px-2 py-1 text-xs sm:px-3 sm:py-1 text-sm bg-green-100 text-green-700 rounded-full">
                             {project.status}
                           </span>
-                          <span className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
+                          <span className="px-2 py-1 text-xs sm:px-3 sm:py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
                             {project.location}
                           </span>
                           {project.featured && (
-                            <span className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
+                            <span className="px-2 py-1 text-xs sm:px-3 sm:py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
                               Featured
                             </span>
                           )}
@@ -874,11 +890,11 @@ const AdminDashboard = () => {
 
           {/* Services Tab */}
           <TabsContent value="services" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-serif text-stone-900">Manage Services</h2>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <h2 className="text-xl sm:text-2xl font-serif text-stone-900">Manage Services</h2>
               <Button 
                 onClick={handleAddService}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Service
@@ -1635,56 +1651,56 @@ const AdminDashboard = () => {
 
       {/* Password Change Modal */}
       <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="sm:max-w-[400px] max-w-[95vw] mx-4">
           <DialogHeader>
-            <DialogTitle className="text-xl font-serif text-stone-900">Change Password</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl font-serif text-stone-900">Change Password</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               Enter your current password and a new password to update your credentials.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div>
-              <Label htmlFor="currentPassword" className="text-stone-700">Current Password</Label>
+              <Label htmlFor="currentPassword" className="text-stone-700 text-sm sm:text-base">Current Password</Label>
               <Input 
                 id="currentPassword"
                 type="password"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                className="border-stone-300"
+                className="border-stone-300 text-sm sm:text-base"
                 placeholder="Enter current password"
               />
             </div>
             
             <div>
-              <Label htmlFor="newPassword" className="text-stone-700">New Password</Label>
+              <Label htmlFor="newPassword" className="text-stone-700 text-sm sm:text-base">New Password</Label>
               <Input 
                 id="newPassword"
                 type="password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                className="border-stone-300"
+                className="border-stone-300 text-sm sm:text-base"
                 placeholder="Enter new password (min 6 characters)"
               />
             </div>
             
             <div>
-              <Label htmlFor="confirmPassword" className="text-stone-700">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword" className="text-stone-700 text-sm sm:text-base">Confirm New Password</Label>
               <Input 
                 id="confirmPassword"
                 type="password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                className="border-stone-300"
+                className="border-stone-300 text-sm sm:text-base"
                 placeholder="Confirm new password"
               />
             </div>
           </div>
           
-          <div className="flex gap-2 pt-4">
+          <div className="flex flex-col sm:flex-row gap-2 pt-4">
             <Button 
               onClick={handleChangePassword}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full sm:w-auto text-sm sm:text-base"
               disabled={isChangingPassword}
             >
               {isChangingPassword ? (
@@ -1699,7 +1715,7 @@ const AdminDashboard = () => {
             <Button 
               variant="outline" 
               onClick={() => setIsPasswordModalOpen(false)}
-              className="border-stone-300 text-stone-700"
+              className="border-stone-300 text-stone-700 w-full sm:w-auto text-sm sm:text-base"
               disabled={isChangingPassword}
             >
               Cancel
