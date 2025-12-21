@@ -15,11 +15,19 @@ export const ProjectsSection = () => {
     const fetchProjects = async () => {
       try {
         const data = await getCachedProjects() as Project[];
-        // Get only featured projects, limit to 4
-        const featuredProjects = data
-          .filter(project => project.featured)
-          .slice(0, 4);
-        setProjects(featuredProjects);
+        // Get featured projects first, then fill with other projects if needed to reach 4
+        const featuredProjects = data.filter(project => project.featured);
+        const otherProjects = data.filter(project => !project.featured);
+        
+        // Combine: featured projects first, then others to reach 4 total
+        let selectedProjects = [...featuredProjects];
+        if (selectedProjects.length < 4) {
+          const needed = 4 - selectedProjects.length;
+          selectedProjects = [...selectedProjects, ...otherProjects.slice(0, needed)];
+        }
+        
+        // Take only first 4 projects
+        setProjects(selectedProjects.slice(0, 4));
       } catch (error) {
         console.error('Failed to fetch projects:', error);
       } finally {
