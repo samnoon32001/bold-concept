@@ -102,11 +102,16 @@ export const Navbar = () => {
               className="relative z-10"
               onClick={() => isHomePage && scrollToSection("hero")}
             >
-              <h1 className={`font-serif text-xl md:text-2xl font-medium tracking-wide transition-colors duration-300 ${
+              <div className={`transition-colors duration-300 ${
                 isScrolled || !isHomePage ? "text-primary-foreground" : "text-white"
               }`}>
-                BOLD<span className="text-secondary">CONCEPT</span>
-              </h1>
+                <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wide">
+                  BOLD<span className="text-red-600">E</span> CONCEPTS
+                </h1>
+                <p className="text-xs md:text-sm font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  TECHNICAL SERVICES LLC
+                </p>
+              </div>
             </Link>
 
             {/* Desktop Navigation */}

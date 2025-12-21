@@ -57,7 +57,7 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-serif">Admin Login</CardTitle>
-          <p className="text-muted-foreground">BOLD CONCEPT Admin Panel</p>
+          <p className="text-muted-foreground">BOLDE CONCEPTS Admin Panel</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

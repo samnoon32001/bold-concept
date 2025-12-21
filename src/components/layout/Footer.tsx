@@ -30,9 +30,14 @@ export const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-6">
-              <h2 className="font-serif text-2xl font-medium">
-                BOLD<span className="text-secondary">CONCEPT</span>
-              </h2>
+              <div>
+                <h2 className="font-serif text-2xl font-bold tracking-wide">
+                  BOLD<span className="text-red-600">E</span> CONCEPTS
+                </h2>
+                <p className="text-xs font-normal tracking-wider" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  TECHNICAL SERVICES LLC
+                </p>
+              </div>
             </Link>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-6">
               Premium interior fit-out, renovation, and design execution. 
@@ -188,7 +193,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/50 text-xs">
-            © {new Date().getFullYear()} BOLD CONCEPT Technical Service. All rights reserved.
+            © {new Date().getFullYear()} BOLDE CONCEPTS Technical Services LLC. All rights reserved.
           </p>
           <div className="flex gap-6">
             <Link
