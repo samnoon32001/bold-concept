@@ -146,6 +146,48 @@ exports.handler = async function(event, context) {
       };
     }
 
+    if (event.httpMethod === 'DELETE') {
+      const { id } = event.pathParameters || {};
+      
+      console.log('Delete ID:', id);
+      
+      if (!id || !ObjectId.isValid(id)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid service ID' })
+        };
+      }
+      
+      // Check if service exists
+      const existingService = await collection.findOne({ _id: new ObjectId(id) });
+      if (!existingService) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'Service not found' })
+        };
+      }
+      
+      const deleteResult = await collection.deleteOne({ _id: new ObjectId(id) });
+      
+      console.log('Delete result:', deleteResult);
+      
+      if (deleteResult.deletedCount === 0) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'Service not found after delete' })
+        };
+      }
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true, deletedCount: deleteResult.deletedCount })
+      };
+    }
+
     return {
       statusCode: 405,
       headers,
