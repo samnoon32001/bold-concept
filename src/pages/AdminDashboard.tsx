@@ -717,37 +717,35 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="w-full bg-stone-100 border border-stone-200 p-1 overflow-x-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-4 w-full min-w-[320px]">
-              <TabsTrigger 
-                value="overview" 
-                className="data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium rounded-md transition-all duration-200 hover:bg-stone-50 min-h-[44px] sm:min-h-[48px] flex items-center justify-center"
-              >
-                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
-                <span className="truncate">Overview</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="projects" 
-                className="data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium rounded-md transition-all duration-200 hover:bg-stone-50 min-h-[44px] sm:min-h-[48px] flex items-center justify-center"
-              >
-                <FolderOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
-                <span className="truncate">Projects</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="services" 
-                className="data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium rounded-md transition-all duration-200 hover:bg-stone-50 min-h-[44px] sm:min-h-[48px] flex items-center justify-center"
-              >
-                <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
-                <span className="truncate">Services</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="website-contact" 
-                className="data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium rounded-md transition-all duration-200 hover:bg-stone-50 min-h-[44px] sm:min-h-[48px] flex items-center justify-center"
-              >
-                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
-                <span className="truncate">Contact</span>
-              </TabsTrigger>
-            </div>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-stone-100 border border-stone-200">
+            <TabsTrigger 
+              value="overview" 
+              className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium transition-all duration-200 hover:bg-stone-50"
+            >
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
+              <span className="truncate">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="projects" 
+              className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium transition-all duration-200 hover:bg-stone-50"
+            >
+              <FolderOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
+              <span className="truncate">Projects</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="services" 
+              className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium transition-all duration-200 hover:bg-stone-50"
+            >
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
+              <span className="truncate">Services</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="website-contact" 
+              className="data-[state=active]:bg-white data-[state=active]:text-stone-900 text-xs sm:text-sm py-2 sm:py-3 px-2 sm:px-4 font-medium transition-all duration-200 hover:bg-stone-50"
+            >
+              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
+              <span className="truncate">Contact</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
