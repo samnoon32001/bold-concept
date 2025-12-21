@@ -211,7 +211,10 @@ const AdminDashboard = () => {
       status: 'ongoing',
       location: '',
       client: '',
-      featured: false
+      featured: false,
+      scope: [],
+      area: '',
+      completionDate: ''
     });
     setSelectedImages([]);
     setIsEditModalOpen(true);
@@ -721,6 +724,23 @@ const AdminDashboard = () => {
                           <div className="flex-1">
                             <h3 className="text-xl font-serif font-semibold text-stone-900">{project.title}</h3>
                             <p className="text-stone-600 mt-1">{project.description}</p>
+                            {project.scope && project.scope.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-sm font-medium text-stone-700 mb-2">Scope of Work:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {project.scope.slice(0, 3).map((scopeItem: string, idx: number) => (
+                                    <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                      {scopeItem}
+                                    </span>
+                                  ))}
+                                  {project.scope.length > 3 && (
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                      +{project.scope.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className="flex gap-2">
                             <Button 
