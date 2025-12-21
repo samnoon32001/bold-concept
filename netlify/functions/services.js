@@ -147,15 +147,50 @@ exports.handler = async function(event, context) {
     }
 
     if (event.httpMethod === 'DELETE') {
-      const { id } = event.pathParameters || {};
+      console.log('=== DELETE REQUEST DEBUG ===');
+      console.log('Path parameters:', event.pathParameters);
+      console.log('Path:', event.path);
+      console.log('Raw path:', event.rawPath);
+      console.log('Raw query:', event.rawQueryString);
       
-      console.log('Delete ID:', id);
+      // Extract ID from multiple possible sources
+      let id = null;
       
-      if (!id || !ObjectId.isValid(id)) {
+      // Try path parameters first
+      if (event.pathParameters && event.pathParameters.id) {
+        id = event.pathParameters.id;
+        console.log('ID from pathParameters:', id);
+      }
+      // Try extracting from path
+      else if (event.path) {
+        const pathParts = event.path.split('/');
+        id = pathParts[pathParts.length - 1];
+        console.log('ID from path:', id);
+      }
+      // Try raw path
+      else if (event.rawPath) {
+        const pathParts = event.rawPath.split('/');
+        id = pathParts[pathParts.length - 1];
+        console.log('ID from rawPath:', id);
+      }
+      
+      console.log('Final extracted ID:', id);
+      
+      if (!id) {
+        console.log('No ID found in request');
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: 'Invalid service ID' })
+          body: JSON.stringify({ error: 'No service ID provided' })
+        };
+      }
+      
+      if (!ObjectId.isValid(id)) {
+        console.log('Invalid ObjectId format:', id);
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid service ID format' })
         };
       }
       
