@@ -185,6 +185,17 @@ export const api = {
     return response.json();
   },
 
+  async deleteService(id: string, token: string): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/services/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete service');
+    return response.json();
+  },
+
   // Contacts
   async submitContact(contactData: Partial<Contact>): Promise<Contact> {
     const response = await fetch(`${API_BASE_URL}/contacts`, {

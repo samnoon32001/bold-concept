@@ -83,6 +83,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteService = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this service?')) {
+      try {
+        const token = localStorage.getItem('token');
+        await api.deleteService(id, token);
+        fetchData();
+      } catch (error) {
+        console.error('Failed to delete service:', error);
+      }
+    }
+  };
+
   const handleAddProject = () => {
     setEditingService(null);
     setEditingWebsiteContact(false);
@@ -673,6 +685,14 @@ const AdminDashboard = () => {
                           className="border-stone-300 text-stone-700 hover:bg-stone-50"
                         >
                           <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => handleDeleteService(service._id)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
