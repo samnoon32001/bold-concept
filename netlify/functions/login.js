@@ -82,7 +82,6 @@ exports.handler = async function(event, context) {
         },
         body: JSON.stringify({ error: 'Invalid email or password' })
       };
-    }
     } catch (error) {
       console.error('Login error details:', error);
       console.error('Error stack:', error.stack);
