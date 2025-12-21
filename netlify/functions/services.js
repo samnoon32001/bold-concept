@@ -96,11 +96,37 @@ exports.handler = async function(event, context) {
     }
 
     if (event.httpMethod === 'PUT') {
-      const { id } = event.pathParameters || {};
+      console.log('=== PUT REQUEST DEBUG ===');
+      console.log('Path parameters:', event.pathParameters);
+      console.log('Path:', event.path);
+      console.log('Raw path:', event.rawPath);
+      console.log('Raw query:', event.rawQueryString);
       
-      console.log('Update ID:', id);
+      // Extract ID from multiple possible sources
+      let id = null;
+      
+      // Try path parameters first
+      if (event.pathParameters && event.pathParameters.id) {
+        id = event.pathParameters.id;
+        console.log('ID from pathParameters:', id);
+      }
+      // Try extracting from path
+      else if (event.path) {
+        const pathParts = event.path.split('/');
+        id = pathParts[pathParts.length - 1];
+        console.log('ID from path:', id);
+      }
+      // Try raw path
+      else if (event.rawPath) {
+        const pathParts = event.rawPath.split('/');
+        id = pathParts[pathParts.length - 1];
+        console.log('ID from rawPath:', id);
+      }
+      
+      console.log('Final extracted ID:', id);
       
       if (!id || !ObjectId.isValid(id)) {
+        console.log('Invalid or missing ID:', id);
         return {
           statusCode: 400,
           headers,
