@@ -41,7 +41,38 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Check for admin credentials
+    // Check for admin credentials in database first
+    const client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db('bold-concept');
+    
+    // Check admin users collection first
+    const adminUser = await db.collection('adminUsers').findOne({ email });
+    
+    if (adminUser && await bcrypt.compare(password, adminUser.password)) {
+      const token = jwt.sign(
+        { email: adminUser.email, role: adminUser.role },
+        jwtSecret,
+        { expiresIn: '24h' }
+      );
+
+      await client.close();
+      console.log('Admin login successful via database');
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          message: 'Login successful',
+          token,
+          user: { email: adminUser.email, role: adminUser.role }
+        })
+      };
+    }
+
+    // Fallback to hardcoded credentials for backward compatibility
     if (email === 'samnoon3200@gmail.com' && password === '320032') {
       const token = jwt.sign(
         { email, role: 'admin' },
@@ -49,7 +80,8 @@ exports.handler = async function(event, context) {
         { expiresIn: '24h' }
       );
 
-      console.log('Admin login successful');
+      await client.close();
+      console.log('Admin login successful via hardcoded credentials');
       return {
         statusCode: 200,
         headers: {
@@ -71,7 +103,8 @@ exports.handler = async function(event, context) {
         { expiresIn: '24h' }
       );
 
-      console.log('Admin login successful');
+      await client.close();
+      console.log('Admin login successful via hardcoded credentials');
       return {
         statusCode: 200,
         headers: {

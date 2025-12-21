@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { MongoClient } from 'mongodb';
 
 const jwtSecret = process.env.JWT_SECRET;
+const uri = process.env.VITE_MONGODB_URI;
 
 exports.handler = async function(event, context) {
   console.log('=== CHANGE PASSWORD API DEBUG ===');
@@ -49,62 +51,95 @@ exports.handler = async function(event, context) {
     const decoded = jwt.verify(token, jwtSecret);
     const userEmail = decoded.email;
 
-    // For hardcoded admin accounts, we can't actually change the password
-    // This would need to be implemented with a database or environment variables
-    // For now, we'll return a message indicating this limitation
-    if (userEmail === 'samnoon3200@gmail.com' || userEmail === 'hallo@boldconcepts-ts.com') {
+    // Connect to database
+    const client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db('bold-concept');
+
+    try {
+      // Check if user exists in adminUsers collection
+      const adminUser = await db.collection('adminUsers').findOne({ email: userEmail });
+      
+      if (adminUser) {
+        // Database admin user - implement real password change
+        console.log('Found admin user in database, implementing password change');
+        
+        // Verify current password
+        const isValidPassword = await bcrypt.compare(currentPassword, adminUser.password);
+        if (!isValidPassword) {
+          await client.close();
+          return {
+            statusCode: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({ error: 'Current password is incorrect' })
+          };
+        }
+
+        // Hash new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        await db.collection('adminUsers').updateOne(
+          { email: userEmail },
+          { 
+            $set: { 
+              password: hashedNewPassword, 
+              updatedAt: new Date() 
+            } 
+          }
+        );
+
+        await client.close();
+        console.log('Password changed successfully for database admin user');
+
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ 
+            message: 'Password changed successfully',
+            email: userEmail
+          })
+        };
+      }
+
+      // Fallback to hardcoded admin accounts
+      if (userEmail === 'samnoon3200@gmail.com' || userEmail === 'hallo@boldconcepts-ts.com') {
+        await client.close();
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ 
+            message: 'Password change for hardcoded admin accounts is not yet implemented. This feature requires database integration.',
+            note: 'Please run the setup-admin script to migrate admin accounts to database for password changes.',
+            action: 'Contact administrator to run setup-admin function'
+          })
+        };
+      }
+
+      // User not found
+      await client.close();
       return {
-        statusCode: 200,
+        statusCode: 404,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ 
-          message: 'Password change for hardcoded admin accounts is not yet implemented. This feature requires database integration.',
-          note: 'For production, consider storing admin credentials in a secure database with proper password hashing.'
-        })
+        body: JSON.stringify({ error: 'User not found' })
       };
-    }
 
-    // For database users (future implementation)
-    // const client = new MongoClient(process.env.VITE_MONGODB_URI);
-    // await client.connect();
-    // const db = client.db('bold-concept');
-    // 
-    // const user = await db.collection('users').findOne({ email: userEmail });
-    // if (!user) {
-    //   await client.close();
-    //   return {
-    //     statusCode: 404,
-    //     body: JSON.stringify({ error: 'User not found' })
-    //   };
-    // }
-    // 
-    // // Verify current password
-    // const isValidPassword = await bcrypt.compare(currentPassword, user.password);
-    // if (!isValidPassword) {
-    //   await client.close();
-    //   return {
-    //     statusCode: 400,
-    //     body: JSON.stringify({ error: 'Current password is incorrect' })
-    //   };
-    // }
-    // 
-    // // Hash new password
-    // const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    // 
-    // // Update password
-    // await db.collection('users').updateOne(
-    //   { email: userEmail },
-    //   { $set: { password: hashedNewPassword, updatedAt: new Date() } }
-    // );
-    // 
-    // await client.close();
-    // 
-    // return {
-    //   statusCode: 200,
-    //   body: JSON.stringify({ message: 'Password changed successfully' })
-    // };
+    } catch (dbError) {
+      await client.close();
+      throw dbError;
+    }
 
   } catch (error) {
     console.error('Change password error:', error);
