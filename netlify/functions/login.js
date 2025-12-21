@@ -94,5 +94,16 @@ exports.handler = async function(event, context) {
         body: JSON.stringify({ error: 'Internal server error', details: error.message })
       };
     }
+  } catch (error) {
+    console.error('Login error details:', error);
+    console.error('Error stack:', error.stack);
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Internal server error', details: error.message })
+    };
   }
 };
