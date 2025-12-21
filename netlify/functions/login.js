@@ -41,35 +41,40 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Check for admin credentials in database first
-    const client = new MongoClient(uri);
-    await client.connect();
-    const db = client.db('bold-concept');
-    
-    // Check admin users collection first
-    const adminUser = await db.collection('adminUsers').findOne({ email });
-    
-    if (adminUser && await bcrypt.compare(password, adminUser.password)) {
-      const token = jwt.sign(
-        { email: adminUser.email, role: adminUser.role },
-        jwtSecret,
-        { expiresIn: '24h' }
-      );
+    let client, db;
+    try {
+      client = new MongoClient(uri);
+      await client.connect();
+      db = client.db('bold-concept');
+      
+      // Check admin users collection first
+      const adminUser = await db.collection('adminUsers').findOne({ email });
+      
+      if (adminUser && await bcrypt.compare(password, adminUser.password)) {
+        const token = jwt.sign(
+          { email: adminUser.email, role: adminUser.role },
+          jwtSecret,
+          { expiresIn: '24h' }
+        );
 
-      await client.close();
-      console.log('Admin login successful via database');
-      return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-          message: 'Login successful',
-          token,
-          user: { email: adminUser.email, role: adminUser.role }
-        })
-      };
+        await client.close();
+        console.log('Admin login successful via database');
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({
+            message: 'Login successful',
+            token,
+            user: { email: adminUser.email, role: adminUser.role }
+          })
+        };
+      }
+    } catch (dbError) {
+      console.error('Database error during admin check:', dbError);
+      if (client) await client.close();
     }
 
     // Fallback to hardcoded credentials for backward compatibility
@@ -80,7 +85,7 @@ exports.handler = async function(event, context) {
         { expiresIn: '24h' }
       );
 
-      await client.close();
+      if (client) await client.close();
       console.log('Admin login successful via hardcoded credentials');
       return {
         statusCode: 200,
@@ -103,7 +108,7 @@ exports.handler = async function(event, context) {
         { expiresIn: '24h' }
       );
 
-      await client.close();
+      if (client) await client.close();
       console.log('Admin login successful via hardcoded credentials');
       return {
         statusCode: 200,
@@ -119,10 +124,24 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // For other users, check database (you can implement this later)
-    const client = new MongoClient(uri);
-    await client.connect();
-    const db = client.db('bold-concept');
+    // For other users, check database (reuse existing connection if available)
+    if (!client) {
+      try {
+        client = new MongoClient(uri);
+        await client.connect();
+        db = client.db('bold-concept');
+      } catch (connectionError) {
+        console.error('Database connection error:', connectionError);
+        return {
+          statusCode: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ error: 'Database connection failed' })
+        };
+      }
+    }
     
     const user = await db.collection('users').findOne({ email });
     
