@@ -73,109 +73,16 @@ exports.handler = async function(event, context) {
         };
       }
 
-      // Auto-create admin accounts in database if they don't exist
-      const hardcodedAdmins = [
-        { email: 'samnoon3200@gmail.com', password: '320032' },
-        { email: 'hallo@boldconcepts-ts.com', password: '123' }
-      ];
-
-      const matchingAdmin = hardcodedAdmins.find(admin => admin.email === email);
-      
-      if (matchingAdmin && matchingAdmin.password === password) {
-        // Create admin account in database
-        const hashedPassword = await bcrypt.hash(matchingAdmin.password, 10);
-        
-        await db.collection('adminUsers').insertOne({
-          email: matchingAdmin.email,
-          password: hashedPassword,
-          role: 'admin',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-
-        const token = jwt.sign(
-          { email: matchingAdmin.email, role: 'admin' },
-          jwtSecret,
-          { expiresIn: '24h' }
-        );
-
-        await client.close();
-        console.log(`Admin account ${matchingAdmin.email} created in database and login successful`);
-        return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify({
-            message: 'Login successful',
-            token,
-            user: { email: matchingAdmin.email, role: 'admin' }
-          })
-        };
-      }
-    } catch (dbError) {
-      console.error('Database error during admin check:', dbError);
-      if (client) await client.close();
-    }
-
-    // For other users, check database (reuse existing connection if available)
-    if (!client) {
-      try {
-        client = new MongoClient(uri);
-        await client.connect();
-        db = client.db('bold-concept');
-      } catch (connectionError) {
-        console.error('Database connection error:', connectionError);
-        return {
-          statusCode: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify({ error: 'Database connection failed' })
-        };
-      }
-    }
-    
-    const user = await db.collection('users').findOne({ email });
-    
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      await client.close();
-      console.log('Invalid credentials');
+      // If admin user not found in database, return error
       return {
         statusCode: 401,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid credentials' })
+        body: JSON.stringify({ error: 'Invalid email or password' })
       };
-    }
-
-    const token = jwt.sign(
-      { email: user.email, role: user.role },
-      jwtSecret,
-      { expiresIn: '24h' }
-    );
-
-    await client.close();
-
-    console.log('User login successful');
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        message: 'Login successful',
-        token,
-        user: { email: user.email, role: user.role }
-      })
-    };
-
-  } catch (error) {
+    } catch (error) {
     console.error('Login error details:', error);
     console.error('Error stack:', error.stack);
     return {
