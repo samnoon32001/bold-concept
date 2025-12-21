@@ -351,8 +351,12 @@ const AdminDashboard = () => {
         // Update existing project
         await api.updateProject(editingProject._id, projectData, token);
       } else {
-        fetchData();
+        // Create new project
+        await api.createProject(projectData, token);
       }
+      
+      // Refresh data to show updated list
+      fetchData();
       
       // Invalidate cache to refresh frontend data
       invalidateCache('projects');
